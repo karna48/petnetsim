@@ -15,6 +15,12 @@ class Place:
     def can_remove(self, n_tokens):
         return self.tokens - n_tokens >= 0
 
+    def add(self, n_tokens):
+        self.tokens += n_tokens
+
+    def remove(self, n_tokens):
+        self.tokens -= n_tokens
+
     def reset(self):
         pass
 

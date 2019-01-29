@@ -29,13 +29,6 @@ class PetriNet:
     def _construct_inputs(self):
         for A in
 
-    def validate(self, raise_=False):
+    def validate(self):
         # transitions with priority and stochastic cannot share inputs
-        if raise_:
-            raise ValueError
-        else:
-            return False
-
-
-
-        return True
+        raise ValueError('xxx')
