@@ -4,7 +4,7 @@ import math
 
 
 def load_xml(filename):
-    net = PetriNet()
+    petri_net = PetriNet()
     root = ET.parse(filename)
 
     P_d = {}
@@ -23,7 +23,7 @@ def load_xml(filename):
 
         p = Place(name, capacity, init_tokens)
         P_d[name] = p
-        net.P.append(p)
+        petri_net.P.append(p)
 
     T_d = {}
 
@@ -39,14 +39,24 @@ def load_xml(filename):
                 t = Transition(name)
             else:
                 t = TransitionPriority(name, int(priority))
-        # TODO
-        # elif t_type == 'timed':
-        #     priority = t_node.attrib.get('priority', None)
-        # elif t_type == 'stochastic':
-
+        elif t_type == 'timed':
+            p_distribution = t_node.attrib.get('p_distribution', 'constant')
+            t_min = float(t_node.attrib['t_min'])
+            t_max = float(t_node.attrib.get('t_max', t_min))
+            if p_distribution == 'constant':
+                p_distribution_func = TransitionTimed.constant_distribution
+            elif p_distribution == 'uniform':
+                p_distribution_func = TransitionTimed.uniform_distribution
+            # TODO: exponential, normal
+            else:
+                raise AttributeError('unknown p_distribution for time: '+p_distribution)
+            t = TransitionTimed(name, t_min, t_max, p_distribution_func)
+        elif t_type == 'stochastic':
+            #TransitionStochastic
+            pass
 
         T_d[name] = t
-        net.T.append(t)
+        petri_net.T.append(t)
 
     for a_node in root.findall('arc'):
         name = a_node.text
@@ -60,14 +70,23 @@ def load_xml(filename):
             source = P_d[source_name]
             target = T_d[target_name]
         else:
-            raise RuntimeError('Arc between "'+source_name+'" and "'+target_name+'" is not between place and transitions')
+            raise RuntimeError('Arc from "'+source_name+'" to "'+target_name+'" is not between place and transition')
         a = Arc(name, source, target, n_tokens)
-        net.A.append(a)
+        petri_net.A.append(a)
 
     for i_node in root.findall('inhibitor'):
+        name = i_node.text
+        source_name = i_node.attrib['source']
+        target_name = i_node.attrib['target']
+        n_tokens = i_node.attrib.get('n_tokens', 1)
         if source_name in P_d and target_name in T_d:
-        i = Inhibitor()
+            source = P_d[source_name]
+            target = T_d[target_name]
+        else:
+            raise RuntimeError('Inhibitor from "'+source_name+'" to "'+target_name+'" is not from place to transition')
+        i = Inhibitor(name, source, target, n_tokens)
+        petri_net.I.append(i)
 
-    net.validate()  # may raise exception
+    petri_net.validate()  # may raise exception
 
-    return net
+    return petri_net

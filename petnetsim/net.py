@@ -16,18 +16,18 @@ class PetriNet:
         self._T_timed = None
         self._T_stochastic = None
 
-        self._T_in = []
-        self._T_out = []
-
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
             obj.reset()
+        self._construct_inputs()
 
     def step(self):
         pass
 
     def _construct_inputs(self):
-        for A in
+        for a in self.A:
+            a.target
+
 
     def validate(self):
         # transitions with priority and stochastic cannot share inputs
