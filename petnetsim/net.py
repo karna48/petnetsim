@@ -11,10 +11,12 @@ class PetriNet:
         self.I = []  # inhibitor arcs
 
         # used during actual simulation
-        self._T_normal = None
-        self._T_priority = None
-        self._T_timed = None
-        self._T_stochastic = None
+        self._T_normal = []
+        self._T_priority = []
+        self._T_timed = []
+        self._T_stochastic = []
+
+        self._dot_T = {}
 
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
@@ -25,10 +27,19 @@ class PetriNet:
         pass
 
     def _construct_inputs(self):
-        for a in self.A:
-            a.target
+        from . import Transition
+        self._dot_T.clear()
+
+        for arc in self.A:
+            if isinstance(arc.target, Transition):
+                self._dot_T[arc.target].append(arc.source)
+
 
 
     def validate(self):
         # transitions with priority and stochastic cannot share inputs
+        self._construct_inputs()
+
+
+
         raise ValueError('xxx')
