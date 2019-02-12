@@ -16,7 +16,8 @@ class PetriNet:
         self._T_timed = []
         self._T_stochastic = []
 
-        self._dot_T = {}
+        self._dot_T = {}  #
+        self._T_dot = {}
 
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
@@ -34,12 +35,14 @@ class PetriNet:
             if isinstance(arc.target, Transition):
                 self._dot_T[arc.target].append(arc.source)
 
-
+            if isinstance(arc.source, Transition):
+                self._T_dot[arc.source].append(arc.target)
 
     def validate(self):
         # transitions with priority and stochastic cannot share inputs
         self._construct_inputs()
-
+        for target, source_transitions in self._dot_T
+            source_T_types = [type(st) for st in source_transitions]
 
 
         raise ValueError('xxx')
