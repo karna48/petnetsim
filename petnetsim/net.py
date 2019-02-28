@@ -1,5 +1,5 @@
 import itertools
-
+from collections import defaultdict
 from .xml_loader import load_xml
 
 
@@ -16,8 +16,9 @@ class PetriNet:
         self._T_timed = []
         self._T_stochastic = []
 
-        self._dot_T = {}  #
-        self._T_dot = {}
+        # TODO: is this right?
+        self._dot_T = defaultdict(list)  # place->transitions
+        self._T_dot = defaultdict(list)  # transition->places
 
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
@@ -39,10 +40,14 @@ class PetriNet:
                 self._T_dot[arc.source].append(arc.target)
 
     def validate(self):
+        from . import Transition, TransitionPriority, TransitionTimed
         # transitions with priority and stochastic cannot share inputs
         self._construct_inputs()
-        for target, source_transitions in self._dot_T
+        # TODO: is this right?
+        for target_place, source_transitions in self._dot_T.items():
             source_T_types = [type(st) for st in source_transitions]
+            if int(TransitionPriority in ) > 1:
+                raise ValueError('place :"'+str(target_place.name)+'" has incompatibile source transitions')
 
 
         raise ValueError('xxx')

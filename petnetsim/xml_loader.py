@@ -11,7 +11,7 @@ def load_xml(filename):
 
     for place_node in root.findall('place'):
         name = place_node.text
-        if name is None or len(name)==0:
+        if name is None or len(name) == 0:
             raise ValueError('Transition must be named inside tag')
 
         capacity = place_node.attrib.get('capacity', math.inf)
@@ -29,7 +29,7 @@ def load_xml(filename):
 
     for transition_node in root.findall('transition'):
         name = transition_node.text
-        if name is None or len(name)==0:
+        if name is None or len(name) == 0:
             raise ValueError('Transition must be named inside tag')
 
         transition_type = transition_node.attrib.get('type', 'normal')

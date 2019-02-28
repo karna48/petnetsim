@@ -62,6 +62,15 @@ class TransitionTimed(Transition):
         self.timer.reset()
 
 
+class TransitionStochastic(Transition):
+    def __init__(self, name, probability):
+        super().__init__(name)
+        self.probability = probability
+
+    def reset(self):
+        super().reset()
+
+
 class Arc:
     def __init__(self, name, source, target, n_tokens):
         self.name = name
