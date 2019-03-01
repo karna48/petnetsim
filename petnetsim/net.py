@@ -17,8 +17,10 @@ class PetriNet:
         self._T_stochastic = []
 
         # TODO: is this right?
-        self._dot_T = defaultdict(list)  # place->transitions
-        self._T_dot = defaultdict(list)  # transition->places
+        self._dot_T = defaultdict(list)  # transition - input places
+        self._T_dot = defaultdict(list)  # transition - output places
+
+        self.
 
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
@@ -40,13 +42,16 @@ class PetriNet:
                 self._T_dot[arc.source].append(arc.target)
 
     def validate(self):
-        from . import Transition, TransitionPriority, TransitionTimed
+        from . import Transition, TransitionPriority, \
+                      TransitionTimed, TransitionStochastic
         # transitions with priority and stochastic cannot share inputs
         self._construct_inputs()
         # TODO: is this right?
         for target_place, source_transitions in self._dot_T.items():
+
             source_T_types = [type(st) for st in source_transitions]
-            if int(TransitionPriority in ) > 1:
+            sum()
+            if int(TransitionPriority in source_T_types)+ > 1:
                 raise ValueError('place :"'+str(target_place.name)+'" has incompatibile source transitions')
 
 
