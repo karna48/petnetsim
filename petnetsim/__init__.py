@@ -1,5 +1,6 @@
 import random
 from .net import PetriNet
+from .xml_loader import load_xml
 
 
 class Place:

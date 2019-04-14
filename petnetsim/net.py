@@ -1,6 +1,5 @@
 import itertools
 from collections import defaultdict
-from .xml_loader import load_xml
 
 
 class PetriNet:
@@ -20,7 +19,7 @@ class PetriNet:
         self._dot_T = defaultdict(list)  # transition - input places
         self._T_dot = defaultdict(list)  # transition - output places
 
-        self.
+        #self.
 
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
@@ -50,8 +49,8 @@ class PetriNet:
         for target_place, source_transitions in self._dot_T.items():
 
             source_T_types = [type(st) for st in source_transitions]
-            sum()
-            if int(TransitionPriority in source_T_types)+ > 1:
+            #sum()
+            if int(TransitionPriority in source_T_types) > 1:
                 raise ValueError('place :"'+str(target_place.name)+'" has incompatibile source transitions')
 
 
