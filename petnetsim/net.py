@@ -15,11 +15,9 @@ class PetriNet:
         self._T_timed = []
         self._T_stochastic = []
 
-        # TODO: is this right?
-        self._dot_T = defaultdict(list)  # transition - input places
-        self._T_dot = defaultdict(list)  # transition - output places
-
-        #self.
+        self.dot_T = defaultdict(list)  # transition - input places
+        self.T_dot = defaultdict(list)  # transition - output places
+        self.W = defaultdict(lambda: 0)  # weights lookup
 
     def reset(self):
         for obj in itertools.chain(self.P, self.T, self.A, self.I):
@@ -28,6 +26,11 @@ class PetriNet:
 
     def step(self):
         pass
+
+    def _fill_W(self):
+        # weight matrix
+        for p, t in itertools.product(self.P, self.T):
+
 
     def _construct_inputs(self):
         from . import Transition
