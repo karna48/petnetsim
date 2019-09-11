@@ -67,8 +67,8 @@ def load_xml(filename):
             source = places_lookup[source_name]
             target = transitions_lookup[target_name]
         elif source_name in transitions_lookup and target_name in places_lookup:
-            source = places_lookup[source_name]
-            target = transitions_lookup[target_name]
+            source = transitions_lookup[source_name]
+            target = places_lookup[target_name]
         else:
             raise RuntimeError('Arc from "'+source_name+'" to "'+target_name+'" is not between place and transition')
         a = Arc(name, source, target, n_tokens)
