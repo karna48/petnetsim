@@ -1,15 +1,18 @@
 import random as _random
+import math
 
 
 class Place:
-    def __init__(self, name, capacity, init_tokens):
+    INF_CAPACITY = 0
+
+    def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY):
         self.name = name
         self.capacity = capacity
         self.init_tokens = init_tokens
         self.tokens = init_tokens
 
     def can_add(self, n_tokens):
-        return self.tokens + n_tokens <= self.capacity
+        return self.capacity == Place.INF_CAPACITY or self.tokens + n_tokens <= self.capacity
 
     def can_remove(self, n_tokens):
         return self.tokens - n_tokens >= 0
@@ -21,12 +24,28 @@ class Place:
         self.tokens -= n_tokens
 
     def reset(self):
-        pass
+        self.tokens = self.init_tokens
 
 
 class Transition:
     def __init__(self, name):
         self.name = name
+        self.inputs = set()   # Arc
+        self.outputs = set()  # Arc
+
+    def enabled(self):
+        return all(arc.source.can_remove(arc.n_tokens) for arc in self.inputs) \
+               and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs)
+
+    def fire(self):
+        for arc in self.inputs:
+            arc.source.remove(arc.n_tokens)
+
+        for arc in self.outputs:
+            arc.target.add(arc.n_tokens)
+
+    def reset(self):
+        pass
 
 
 class TransitionPriority(Transition):
@@ -56,9 +75,22 @@ class TransitionTimed(Transition):
     def uniform_distribution(t_min, t_max):
         return _random.uniform(t_min, t_max)
 
+    def enabled(self):
+        return super().enabled() and self.remaining <= 0
+
+    def enabled_waiting(self):
+        return super().enabled() and self.remaining > 0
+
+    def reset_remaining(self):
+        self.remaining = self.p_distribution_func(self.t_min, self.t_max)
+
+    def fire(self):
+        super().fire()
+        self.reset_remaining()
+
     def reset(self):
         super().reset()
-        self.timer.reset()
+        self.reset_remaining()
 
 
 class TransitionStochastic(Transition):
@@ -71,11 +103,15 @@ class TransitionStochastic(Transition):
 
 
 class Arc:
-    def __init__(self, name, source, target, n_tokens):
+    def __init__(self, source, target, n_tokens, name=None):
         self.name = name
         self.source = source
         self.target = target
         self.n_tokens = n_tokens
+        if isinstance(source, Transition):
+            source.outputs.add(self)
+        if isinstance(target, Transition):
+            target.inputs.add(self)
 
 
 class Inhibitor:
