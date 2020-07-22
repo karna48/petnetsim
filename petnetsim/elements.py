@@ -4,9 +4,14 @@ import math
 
 class Place:
     INF_CAPACITY = 0
+    _annonymous_counter = 1
 
     def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY):
-        self.name = name
+        if name is None:
+            self.name = 'P_'+str(Place._annonymous_counter)
+            Place._annonymous_counter += 1
+        else:
+            self.name = name
         self.capacity = capacity
         self.init_tokens = init_tokens
         self.tokens = init_tokens
@@ -28,8 +33,14 @@ class Place:
 
 
 class Transition:
+    _annonymous_counter = 1
+
     def __init__(self, name):
-        self.name = name
+        if name is None:
+            self.name = 'T_'+str(Transition._annonymous_counter)
+            Transition._annonymous_counter += 1
+        else:
+            self.name = name
         self.inputs = set()   # Arc
         self.outputs = set()  # Arc
         self.fired_times = 0
@@ -106,7 +117,14 @@ class TransitionStochastic(Transition):
 
 
 class Arc:
+    _annonymous_counter = 1
+
     def __init__(self, source, target, n_tokens, name=None):
+        if name is None:
+            self.name = 'Arc_'+str(Arc._annonymous_counter)
+            Arc._annonymous_counter += 1
+        else:
+            self.name = name
         self.name = name
         self.source = source
         self.target = target
@@ -118,8 +136,14 @@ class Arc:
 
 
 class Inhibitor:
+    _annonymous_counter = 1
+
     def __init__(self, name, source, target, n_tokens):
-        self.name = name
+        if name is None:
+            self.name = 'Arc_'+str(Inhibitor._annonymous_counter)
+            Inhibitor._annonymous_counter += 1
+        else:
+            self.name = name
         self.source = source
         self.target = target
         self.n_tokens = n_tokens

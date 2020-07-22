@@ -1,3 +1,23 @@
+class PetriNet:
+    def __init__(self, places, transitions, arcs):
+        self.places = places
+        self.transitions = transitions
+        self.arcs = arcs
+
+        self.validate()
+
+    def step(self):
+
+    def print_places(self):
+        for p in self.places:
+            print(p.name, p.tokens, sep=': ')
+
+    def validate(self):
+        # TODO : validation of whole net
+        print('TODO: PetriNet.validate')
+        pass
+
+
 # import itertools
 # from collections import defaultdict
 # from .elements import *
