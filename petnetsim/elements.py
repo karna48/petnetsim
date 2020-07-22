@@ -32,6 +32,7 @@ class Transition:
         self.name = name
         self.inputs = set()   # Arc
         self.outputs = set()  # Arc
+        self.fired_times = 0
 
     def enabled(self):
         return all(arc.source.can_remove(arc.n_tokens) for arc in self.inputs) \
@@ -44,8 +45,10 @@ class Transition:
         for arc in self.outputs:
             arc.target.add(arc.n_tokens)
 
+        self.fired_times += 1
+
     def reset(self):
-        pass
+        self.fired_times = 0
 
 
 class TransitionPriority(Transition):

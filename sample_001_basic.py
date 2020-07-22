@@ -1,5 +1,7 @@
 from itertools import count, combinations
 from petnetsim.elements import Place, Arc, Transition
+from random import choice
+
 
 A = Place('A', init_tokens=6)
 B = Place('B', init_tokens=4)
@@ -25,6 +27,8 @@ def print_sim(step, t):
         print(p.name, p.tokens, sep=': ')
 
 
+# TODO: make into PetriNet object
+
 def run():
 
     print('------------------------------------')
@@ -36,9 +40,9 @@ def run():
         p.reset()
 
     max_steps = 100
-    t = 0.0
+    sim_t = 0.0
 
-    print_sim(0, t)
+    print_sim(0, sim_t)
 
     for step in range(1, max_steps):
 
@@ -46,14 +50,16 @@ def run():
         enabled = [t for t in transitions if t.enabled()]
 
         # TODO: conflict groups of enabled
-        conflict_groups = [[enabled]]
-        for t in conflict_groups:
-            t.fire()
+        if len(enabled):
+            conflict_groups = [enabled]
+            for cg in conflict_groups:
+                t = choice(cg)
+                t.fire()
 
         # TODO: if no transitions are active, advance time
         num_waiting = 0
 
-        print_sim(step, t)
+        print_sim(step, sim_t)
 
         if len(enabled) == 0 and num_waiting == 0:
             print(' -- breaking condition --')
