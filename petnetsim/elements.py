@@ -41,16 +41,22 @@ class Transition:
             Transition._annonymous_counter += 1
         else:
             self.name = name
-        self.inputs = set()   # Arc
-        self.outputs = set()  # Arc
+        self.inputs = set()   # Arc, Inhibitor
+        self.outputs = set()  # Arc, Inhibitor
         self.fired_times = 0
+        self.in_arcs = []  # init in reset
+        self.inhibitors = []  # init in reset
 
     def enabled(self):
-        return all(arc.source.can_remove(arc.n_tokens) for arc in self.inputs) \
-               and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs)
+        if len(self.inhibitors):
+            print(self.name, 'inhibitors (name, state):', [(inhibitor.name, inhibitor.source.can_remove(inhibitor.n_tokens)) for inhibitor in self.inhibitors])
+
+        return all(arc.source.can_remove(arc.n_tokens) for arc in self.in_arcs) \
+               and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs) \
+               and not any(inhibitor.source.can_remove(inhibitor.n_tokens) for inhibitor in self.inhibitors)
 
     def fire(self):
-        for arc in self.inputs:
+        for arc in self.in_arcs:
             arc.source.remove(arc.n_tokens)
 
         for arc in self.outputs:
@@ -59,6 +65,10 @@ class Transition:
         self.fired_times += 1
 
     def reset(self):
+        self.in_arcs = [arc for arc in self.inputs if isinstance(arc, Arc)]
+        self.inhibitors = [inhibitor for inhibitor in self.inputs if isinstance(inhibitor, Inhibitor)]
+        # note: inhibitors can't be outputs
+
         self.fired_times = 0
 
 
@@ -138,12 +148,19 @@ class Arc:
 class Inhibitor:
     _annonymous_counter = 1
 
-    def __init__(self, name, source, target, n_tokens):
+    def __init__(self, source, target, n_tokens, name=None):
         if name is None:
-            self.name = 'Arc_'+str(Inhibitor._annonymous_counter)
+            self.name = 'Inhibitor_'+str(Inhibitor._annonymous_counter)
             Inhibitor._annonymous_counter += 1
         else:
             self.name = name
         self.source = source
         self.target = target
         self.n_tokens = n_tokens
+        if not isinstance(source, Place):
+            raise RuntimeError('inhibitor source must be a Place')
+
+        if isinstance(target, Transition):
+            target.inputs.add(self)
+        else:
+            raise RuntimeError('inhibitor target must be a Transition')
