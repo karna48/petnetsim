@@ -1,5 +1,5 @@
 from itertools import count, combinations
-from petnetsim.elements import Place, Arc, Transition, Inhibitor
+from petnetsim import *
 from random import choice
 import numpy as np
 
@@ -47,28 +47,10 @@ def run():
 
     print_sim(0, sim_t)
 
-    conflict_groups = [{transitions[0]}]
-    for t in transitions[1:]:
-        add_to_cg = False
-        # print('t: ', t.name)
-        for cg in conflict_groups:
-            for cg_t in cg:
-                # ignore inhibitors!
-                t_in = set(arc.source for arc in t.inputs if isinstance(arc, Arc))
-                t_out = set(arc.target for arc in t.outputs if isinstance(arc, Arc))
-                cg_t_in = set(arc.source for arc in cg_t.inputs if isinstance(arc, Arc))
-                cg_t_out = set(arc.target for arc in cg_t.outputs if isinstance(arc, Arc))
+    conflict_groups, conflict_groups_types = make_conflict_groups(transitions)
 
-                add_to_cg = add_to_cg or not t_in.isdisjoint(cg_t_in)
-                add_to_cg = add_to_cg or not t_out.isdisjoint(cg_t_out)
-                if add_to_cg:
-                    break
-            if add_to_cg:
-                cg.add(t)
-                break
+    # conflig group types
 
-        if not add_to_cg:
-            conflict_groups.append([t])
 
     # masks
     enabled = np.zeros(len(transitions), dtype=np.bool)
