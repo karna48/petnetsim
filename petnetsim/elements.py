@@ -1,5 +1,4 @@
 import random as _random
-import math
 
 
 class Place:
@@ -49,7 +48,9 @@ class Transition:
 
     def enabled(self):
         # if len(self.inhibitors):
-        #     print(self.name, 'inhibitors (name, state):', [(inhibitor.name, inhibitor.source.can_remove(inhibitor.n_tokens)) for inhibitor in self.inhibitors])
+        #     print(self.name, 'inhibitors (name, state):',
+        #           [(inhibitor.name, inhibitor.source.can_remove(inhibitor.n_tokens))
+        #            for inhibitor in self.inhibitors])
 
         return all(arc.source.can_remove(arc.n_tokens) for arc in self.in_arcs) \
                and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs) \
@@ -71,7 +72,6 @@ class Transition:
         self.inhibitors = tuple(inhibitor for inhibitor in self.inputs if isinstance(inhibitor, Inhibitor))
         # note: inhibitors can't be outputs
 
-
     def reset(self):
         self.fired_times = 0
 
@@ -82,42 +82,41 @@ class TransitionPriority(Transition):
         self.priority = priority
 
 
+def constant_distribution(t_min, t_max):
+    return t_min
+
+
+def uniform_distribution(t_min, t_max):
+    return _random.uniform(t_min, t_max)
+
+
 class TransitionTimed(Transition):
     T_EPSILON = 1e6
 
-    def __init__(self, name, t_min, t_max, p_distribution_func):
+    def __init__(self, name, t_min, t_max=1, p_distribution_func=constant_distribution):
         super().__init__(name)
         self.remaining = 0
         self.t_min = t_min
         self.t_max = t_max
         self.p_distribution_func = p_distribution_func
-
-    @staticmethod
-    def constant_distribution(t_min, t_max):
-        return t_min
-
-    @staticmethod
-    def uniform_distribution(t_min, t_max):
-        return _random.uniform(t_min, t_max)
+        self.is_waiting = False
+        self.time = 0.0
 
     def enabled(self):
-        return super().enabled() and self.remaining <= 0
-
-    def enabled_waiting(self):
-        return super().enabled() and self.remaining > 0
-
-    def reset_remaining(self):
-        self.remaining = self.p_distribution_func(self.t_min, self.t_max)
+        return super().enabled() and not self.is_waiting
 
     def fire(self):
         super().fire()
-        # TODO: this might be wrong!
-        self.reset_remaining()
+        self.is_waiting = False
+
+    def wait(self):
+        self.is_waiting = True
+        self.time = self.p_distribution_func(self.t_min, self.t_max)
+        return self.time
 
     def reset(self):
         super().reset()
-        # TODO: this might be wrong!
-        self.reset_remaining()
+        self.is_waiting = False
 
 
 class TransitionStochastic(Transition):

@@ -1,5 +1,9 @@
+
+# doc/drawing/sample_001_basic.svg
+
 from itertools import count, combinations
 from petnetsim import *
+
 
 def run():
     petri_net = PetriNet([Place('A', init_tokens=6),
@@ -19,11 +23,12 @@ def run():
 
     max_steps = 100
 
+    print('--------------- step', petri_net.step_num)
     petri_net.print_places()
 
     while not petri_net.ended and petri_net.step_num < max_steps:
-        print('--------------- step', petri_net.step_num)
         petri_net.step()
+        print('--------------- step', petri_net.step_num)
         petri_net.print_places()
 
     if petri_net.ended:

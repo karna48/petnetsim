@@ -1,3 +1,5 @@
+# doc/drawing/sample_004_stochastic.svg
+
 from itertools import count, combinations
 from petnetsim import *
 import numpy as np
@@ -16,11 +18,12 @@ def run():
 
     max_steps = 100000
 
+    print('--------------- step', petri_net.step_num)
     petri_net.print_places()
 
     while not petri_net.ended and petri_net.step_num < max_steps:
-        print('--------------- step', petri_net.step_num)
         petri_net.step()
+        print('--------------- step', petri_net.step_num)
         petri_net.print_places()
 
     if petri_net.ended:

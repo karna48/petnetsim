@@ -1,6 +1,5 @@
 from enum import IntEnum
 import numpy as np
-import random
 from operator import attrgetter
 from .elements import *
 # from .xml_loader import load_xml
@@ -16,14 +15,22 @@ class ConflictGroupType(IntEnum):
 class PetriNet:
     def __init__(self, places, transitions, arcs):
         self._names_lookup = {}
+
+        places = [Place(p) if isinstance(p, str) else p for p in places]
+
         for p in places:
             if p.name in self._names_lookup:
                 raise RuntimeError('name reused: '+p.name)
             self._names_lookup[p.name] = p
+
+        transitions = [Transition(t) if isinstance(t, str) else t for t in transitions]
+
         for t in transitions:
             if t.name in self._names_lookup:
                 raise RuntimeError('name reused: '+t.name)
             self._names_lookup[t.name] = t
+
+        arcs = [Arc(a[0], a[1]) if isinstance(a, tuple) else a for a in arcs]
 
         for arc in arcs:
             if arc.name in self._names_lookup:
@@ -41,8 +48,10 @@ class PetriNet:
         self._make_conflict_groups()
 
         self.enabled = np.zeros(len(transitions), dtype=np.bool)
+        self.enabled_tmp = np.zeros(len(transitions), dtype=np.bool)
         self._ended = False
         self.step_num = 0
+        self.time = 0.0
         # fired in last step
         self.fired = []
 
@@ -53,7 +62,9 @@ class PetriNet:
     def reset(self):
         self._ended = False
         self.step_num = 0
+        self.time = 0.0
         self.fired.clear()
+        self.conflict_groups_waiting.fill(0)
         for t in self.transitions:
             t.reset()
         for p in self.places:
@@ -68,6 +79,7 @@ class PetriNet:
 
         CGT = ConflictGroupType
 
+        num_fired = 0
         enabled_any = self.enabled.any()
         if enabled_any:
             np.bitwise_and(self.enabled, self.conflict_groups_mask, out=self.enabled_conflict_groups)
@@ -75,23 +87,72 @@ class PetriNet:
             for cgi, ecg in enumerate(self.enabled_conflict_groups):
                 if ecg.any():
                     cg_type = self.conflict_groups_types[cgi]
+                    t_idxs = np.argwhere(ecg).flatten()  # absolute indicies of enabled transitions in group
                     if cg_type == CGT.Normal:
-                        t_idx = random.choice(np.argwhere(ecg))[0]
+                        t_fire_idx = np.random.choice(t_idxs)
+                    elif cg_type == CGT.Priority:
+                        priorities = self.conflict_group_data[cgi]
+                        ep = priorities[t_idxs]
+                        ep_idxs = np.argwhere(ep == ep.max()).flatten()
+                        ep_idx = np.random.choice(ep_idxs)
+                        t_fire_idx = t_idxs[ep_idx]
+                    elif cg_type == CGT.Stochastic:
+                        probabilities = self.conflict_group_data[cgi][t_idxs]
+                        # "normalize" the sum of probabilities to 1
+                        probabilities_norm = probabilities * (1 / np.sum(probabilities))
+                        t_fire_idx = np.random.choice(t_idxs, p=probabilities_norm[t_idxs])
+                    elif cg_type == CGT.Timed:
+                        # conflict_group_data[cgi][0, ti] = isinstance(t, TransitionTimed)
+                        # conflict_group_data[cgi][1, ti] = not isinstance(t, TransitionTimed)
+                        if self.conflict_groups_waiting[cgi] <= 0:
+                            normal_enabled = self.enabled_tmp
+                            np.bitwise_and(ecg, self.conflict_group_data[cgi][1], out=normal_enabled)
+                            if any(normal_enabled):  # use normal transition
+                                normal_t_idxs = np.argwhere(normal_enabled).flatten()
+                                t_fire_idx = np.random.choice(normal_t_idxs)
+                            else:  # then must be timed
+                                timed_enabled = self.enabled_tmp
+                                np.bitwise_and(ecg, self.conflict_group_data[cgi][0], out=timed_enabled)
+                                t_fire_idx = None
+                                timed_t_idxs = np.argwhere(timed_enabled).flatten()
+                                timed_t_idx = np.random.choice(timed_t_idxs)
+                                timed_t = self.transitions[timed_t_idx]
+                                self.conflict_groups_waiting[cgi] = timed_t.wait()
+                                #print(' ', timed_t.name, 'wait =', self.conflict_groups_waiting[cgi])
+                        else:
+                            t_fire_idx = None
 
+                    if t_fire_idx is not None:
+                        t = self.transitions[t_fire_idx]
+                        t.fire()
+                        num_fired += 1
+                        if record_fired:
+                            self.fired.append(t)
 
-                    t_idx = random.choice(np.argwhere(ecg))[0]
-                    t = self.transitions[t_idx]
-                    t.fire()
-                    if record_fired:
-                        self.fired.append(t)
+        num_waiting = np.sum(self.conflict_groups_waiting > 0)
 
-        num_waiting = 0
+        if num_waiting > 0 and num_fired == 0:
+            # nothing fired -> advance time and fire waiting timed transitions
+            min_time = np.min(self.conflict_groups_waiting[self.conflict_groups_waiting>0])
+            self.time += min_time
+
+            for cgi in np.argwhere(self.conflict_groups_waiting == min_time).flatten():
+                for ti in np.where(self.conflict_group_data[cgi][0])[0]:
+                    t = self.transitions[ti]
+                    if t.is_waiting:
+                        t.fire()
+                        num_fired += 1
+                        if record_fired:
+                            self.fired.append(t)
+                        break
+                self.conflict_groups_waiting[cgi] = 0
+
+            np.subtract(self.conflict_groups_waiting, min_time, out=self.conflict_groups_waiting)
+            np.clip(self.conflict_groups_waiting, 0, float('inf'), out=self.conflict_groups_waiting)
+
         if not enabled_any and num_waiting == 0:
             self._ended = True
         self.step_num += 1
-
-    # def run(self, max_steps=None, max_sim_time=None):
-    #     sim_time = 0.0
 
     def print_places(self):
         for p in self.places:
@@ -125,9 +186,9 @@ class PetriNet:
                     break
 
             if not add_to_cg:
-                conflict_groups_sets.append([t])
+                conflict_groups_sets.append({t})
 
-        conflict_groups = tuple(tuple(sorted(cgs, key=attrgetter('name'))) for cgs in conflict_groups_sets)
+        #conflict_groups = tuple(tuple(sorted(cgs, key=attrgetter('name'))) for cgs in conflict_groups_sets)
 
         conflict_groups_types = [None for _ in conflict_groups_sets]
 
@@ -151,26 +212,31 @@ class PetriNet:
             elif all(tt == CGT.Normal or tt == CGT.Priority for tt in t_types):
                 # priority can be mixed with Normal
                 cg_type = CGT.Priority
-                conflict_group_data = np.zeros(len(self.transitions), dtype=np.bool)
+                conflict_group_data[cg_i] = np.zeros(len(self.transitions), dtype=np.uint)
             elif all(tt == CGT.Normal or tt == CGT.Timed for tt in t_types):
                 # Timed can be mixed with Normal
                 cg_type = CGT.Timed
+                conflict_group_data[cg_i] = np.zeros((2, len(self.transitions)), dtype=np.bool)
             elif all(tt == CGT.Stochastic for tt in t_types):
                 group_members_names = ', '.join([t.name for t in cg])
                 # stochastic are on their own
                 cg_type = CGT.Stochastic
                 one_t_in_cg = next(iter(cg))
-                if not all(t.inputs == one_t_in_cg.inputs for t in cg):
-                    return RuntimeError('all members of stochastic group must share the same inputs: '+group_members_names)
+                ot_sources = set(i.source for i in one_t_in_cg.inputs)
+                if not all(set(i.source for i in t.inputs) == ot_sources for t in cg):
+                    raise RuntimeError('all members of stochastic group must share the same inputs: '+group_members_names)
 
+                # TODO: maybe optional feature - all transitions in stochastic group might be required to take same amount of tokens?
                 #if not all(t.inputs.n_tokens == one_t_in_cg.inputs.n_tokens for t in cg):
                 #    RuntimeError('all members of stochastic group must take same number of tokens:'+group_members_names)
 
+                conflict_group_data[cg_i] = np.zeros(len(self.transitions))
             else:
                 raise RuntimeError('Unsupported combination of transitions: '+', '.join([str(tt) for tt in t_types]))
 
             conflict_groups_types[cg_i] = cg_type
 
+        self.conflict_groups_waiting = np.zeros(len(conflict_groups_sets))
         self.conflict_groups_sets = tuple(tuple(cg) for cg in conflict_groups_sets)
         self.conflict_groups_types = tuple(conflict_groups_types)
         self.conflict_groups_mask = np.zeros((len(conflict_groups_sets), len(self.transitions)), dtype=np.bool)
@@ -184,8 +250,9 @@ class PetriNet:
                     if cgt == CGT.Priority:
                         conflict_group_data[cgi][ti] = t.priority if hasattr(t, 'priority') else 0
                     elif cgt == CGT.Timed:
-                        conflict_group_data[cgi][ti] = isinstance(t, TransitionTimed)
+                        conflict_group_data[cgi][0, ti] = isinstance(t, TransitionTimed)
+                        conflict_group_data[cgi][1, ti] = not isinstance(t, TransitionTimed)
                     elif cgt == CGT.Stochastic:
-                        conflict_group_data[cgi][ti] = isinstance(t, TransitionTimed)
+                        conflict_group_data[cgi][ti] = t.probability
 
         self.conflict_group_data = tuple(conflict_group_data)

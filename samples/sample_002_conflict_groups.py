@@ -1,3 +1,5 @@
+# doc/drawing/sample_002_conflict_groups.svg
+
 from itertools import count, combinations
 from petnetsim import *
 from random import choice
@@ -26,16 +28,18 @@ def run():
 
     max_steps = 100
 
-
     print('conflict groups:', [sorted([t.name for t in cg]) for cg in petri_net.conflict_groups_sets])
 
+    print('--------------- step', petri_net.step_num)
     petri_net.print_places()
 
     while not petri_net.ended and petri_net.step_num < max_steps:
-        print('--------------- step', petri_net.step_num)
         petri_net.step()
-        for t in petri_net.fired:
-            print(' ', t.name, 'fired')
+        print('--------------- step', petri_net.step_num)
+
+        if len(petri_net.fired):
+            print(' fired: ', end='')
+            print(*(t.name for t in petri_net.fired), sep=', ')
         petri_net.print_places()
 
     if petri_net.ended:

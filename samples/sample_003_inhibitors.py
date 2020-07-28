@@ -1,3 +1,5 @@
+# doc/drawing/sample_003_inhibitors.svg
+
 from itertools import count, combinations
 from petnetsim import *
 import numpy as np
@@ -12,7 +14,8 @@ def run():
     T2 = Transition('T2')
     transitions = [Transition('T1'), T2]
 
-    # arcs can be constructed with names which will be replaced by objects by PetriNet object
+    # arcs can be constructed with Place/Transition objects
+    # or  with names which will be replaced by objects by PetriNet.__init__
     arcs = [Arc('A', 'T1', 1),
             Inhibitor('B', 'T1', 1),
             Arc('T1', C, 1),
@@ -30,11 +33,12 @@ def run():
 
     max_steps = 100
 
+    print('--------------- step', petri_net.step_num)
     petri_net.print_places()
 
     while not petri_net.ended and petri_net.step_num < max_steps:
-        print('--------------- step', petri_net.step_num)
         petri_net.step()
+        print('--------------- step', petri_net.step_num)
         petri_net.print_places()
 
     if petri_net.ended:
