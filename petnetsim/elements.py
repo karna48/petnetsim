@@ -48,8 +48,8 @@ class Transition:
         self.inhibitors = []  # init in reset
 
     def enabled(self):
-        if len(self.inhibitors):
-            print(self.name, 'inhibitors (name, state):', [(inhibitor.name, inhibitor.source.can_remove(inhibitor.n_tokens)) for inhibitor in self.inhibitors])
+        # if len(self.inhibitors):
+        #     print(self.name, 'inhibitors (name, state):', [(inhibitor.name, inhibitor.source.can_remove(inhibitor.n_tokens)) for inhibitor in self.inhibitors])
 
         return all(arc.source.can_remove(arc.n_tokens) for arc in self.in_arcs) \
                and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs) \
@@ -64,11 +64,15 @@ class Transition:
 
         self.fired_times += 1
 
-    def reset(self):
-        self.in_arcs = [arc for arc in self.inputs if isinstance(arc, Arc)]
-        self.inhibitors = [inhibitor for inhibitor in self.inputs if isinstance(inhibitor, Inhibitor)]
+    def freeze(self):
+        self.inputs = frozenset(self.inputs)
+        self.outputs = frozenset(self.outputs)
+        self.in_arcs = tuple(arc for arc in self.inputs if isinstance(arc, Arc))
+        self.inhibitors = tuple(inhibitor for inhibitor in self.inputs if isinstance(inhibitor, Inhibitor))
         # note: inhibitors can't be outputs
 
+
+    def reset(self):
         self.fired_times = 0
 
 
@@ -76,9 +80,6 @@ class TransitionPriority(Transition):
     def __init__(self, name, priority):
         super().__init__(name)
         self.priority = priority
-
-    def reset(self):
-        super().reset()
 
 
 class TransitionTimed(Transition):
@@ -110,45 +111,58 @@ class TransitionTimed(Transition):
 
     def fire(self):
         super().fire()
+        # TODO: this might be wrong!
         self.reset_remaining()
 
     def reset(self):
         super().reset()
+        # TODO: this might be wrong!
         self.reset_remaining()
 
 
 class TransitionStochastic(Transition):
+    # NOTE: stochastic is almost normal transition
     def __init__(self, name, probability):
         super().__init__(name)
         self.probability = probability
-
-    def reset(self):
-        super().reset()
 
 
 class Arc:
     _annonymous_counter = 1
 
-    def __init__(self, source, target, n_tokens, name=None):
+    def __init__(self, source, target, n_tokens=1, name=None):
         if name is None:
             self.name = 'Arc_'+str(Arc._annonymous_counter)
             Arc._annonymous_counter += 1
         else:
             self.name = name
-        self.name = name
         self.source = source
         self.target = target
         self.n_tokens = n_tokens
-        if isinstance(source, Transition):
-            source.outputs.add(self)
-        if isinstance(target, Transition):
-            target.inputs.add(self)
+
+        if not (isinstance(self.source, str) or isinstance(self.target, str)):
+            self.connect(None)
+
+    def connect(self, names_lookup):
+        if isinstance(self.source, str):
+            self.source = names_lookup[self.source]
+        if isinstance(self.target, str):
+            self.target = names_lookup[self.target]
+
+        if isinstance(self.source, Transition):
+            if not isinstance(self.target, Place):
+                raise RuntimeError('arc from Transition must go to a Place')
+            self.source.outputs.add(self)
+        if isinstance(self.target, Transition):
+            if not isinstance(self.source, Place):
+                raise RuntimeError('arc to Transition must go from a Place')
+            self.target.inputs.add(self)
 
 
 class Inhibitor:
     _annonymous_counter = 1
 
-    def __init__(self, source, target, n_tokens, name=None):
+    def __init__(self, source, target, n_tokens=1, name=None):
         if name is None:
             self.name = 'Inhibitor_'+str(Inhibitor._annonymous_counter)
             Inhibitor._annonymous_counter += 1
@@ -157,10 +171,21 @@ class Inhibitor:
         self.source = source
         self.target = target
         self.n_tokens = n_tokens
-        if not isinstance(source, Place):
+
+        if not (isinstance(self.source, str) or isinstance(self.target, str)):
+            self.connect(None)
+
+    def connect(self, names_lookup):
+        if isinstance(self.source, str):
+            self.source = names_lookup[self.source]
+        if isinstance(self.target, str):
+            self.target = names_lookup[self.target]
+
+        if not isinstance(self.source, Place):
             raise RuntimeError('inhibitor source must be a Place')
 
-        if isinstance(target, Transition):
-            target.inputs.add(self)
+        if isinstance(self.target, Transition):
+            self.target.inputs.add(self)
         else:
             raise RuntimeError('inhibitor target must be a Transition')
+
