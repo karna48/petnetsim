@@ -165,6 +165,47 @@ class PetriNet:
 
     def _make_conflict_groups(self):
 
+        # print('sharing the inputs and ouputs via normal arcs')
+        # print('; ', end='')
+        # for t1 in self.transitions[1:]:
+        #     print(t1.name, end='; ')
+        # print()
+
+        groups = []
+
+        for t1i, t1 in enumerate(self.transitions[:-1]):
+            print(*[set(t.name for t in g) for g in groups])
+            in_groups = [t1 in g for g in groups]
+            if sum(in_groups) > 1:
+                raise RuntimeError('transition can be only in one conflict group')
+            to_group: set
+            if not any(in_groups):
+                groups.append({t1})
+                to_group = groups[-1]
+            else:
+                to_group = groups[in_groups.index(True)]
+
+            # print(t1.name, end='; ')
+            # for _ in range(t1i):
+            #     print('; ', end='')
+            for t2 in self.transitions[t1i+1:]:
+                if t1 is not t2:
+                    # ignore inhibitors!
+                    t1_in = set(arc.source for arc in t1.inputs if isinstance(arc, Arc))
+                    t1_out = set(arc.target for arc in t1.outputs if isinstance(arc, Arc))
+                    t2_in = set(arc.source for arc in t2.inputs if isinstance(arc, Arc))
+                    t2_out = set(arc.target for arc in t2.outputs if isinstance(arc, Arc))
+                    # print(not t1_in.isdisjoint(t2_in) or not t1_out.isdisjoint(t2_out),
+                    #       'in:', *(x.name for x in t1_in.intersection(t2_in)),
+                    #       'out:', *(x.name for x in t1_out.intersection(t2_out)),
+                    #       end='; ')
+                    if not t1_in.isdisjoint(t2_in) or not t1_out.isdisjoint(t2_out):
+                        to_group.add(t2)
+
+            print()
+
+
+
         conflict_groups_sets = [{self.transitions[0]}]
         for t in self.transitions[1:]:
             add_to_cg = False
