@@ -24,6 +24,7 @@ def run():
             ]
 
     petri_net = PetriNet(places, transitions, arcs)
+    print('conflict groups:', petri_net.conflict_groups_str)
 
     print('------------------------------------')
     print(' run')

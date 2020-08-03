@@ -12,13 +12,13 @@ def run():
                      ['P1HaveR1', 'P2HaveR2'] + \
                      [p+s for p, s in itertools.product(['P1', 'P2'], ['Processing', 'CriticalSectionOut'])]
     transitions = [p+s for p, s in itertools.product(['P1', 'P2'], ['Release'])] + \
-                  [TransitionPriority('P1AquireR1', 1), TransitionPriority('P2AquireR2', 1), TransitionPriority('P1AquireR2', 1), TransitionPriority('P2AquireR1', 1),
-                   'P1ReleaseR1Retry', 'P2ReleaseR2Retry']
+                  ['P1AquireR1', 'P2AquireR2', 'P1AquireR2', 'P2AquireR1',
+                   TransitionTimed('P1ReleaseR1Watchdog', 0.1)]
     arcs = [('R1', 'P1AquireR1'), ('R1', 'P2AquireR1'), ('R2', 'P1AquireR2'), ('R2', 'P2AquireR2'),
             ('P1Release', 'R1'), ('P1Release', 'R2'), ('P2Release', 'R1'), ('P2Release', 'R2'),
-            ('P1ReleaseR1Retry', 'P1CriticalSectionIn'), ('P2ReleaseR2Retry', 'P2CriticalSectionIn'),
-            ('P1ReleaseR1Retry', 'R1'), ('P2ReleaseR2Retry', 'R2'),
-            ('P1HaveR1', 'P1ReleaseR1Retry'), ('P2HaveR2', 'P2ReleaseR2Retry')]
+            ('P1ReleaseR1Watchdog', 'P1CriticalSectionIn'),
+            ('P1ReleaseR1Watchdog', 'R1'),
+            ('P1HaveR1', 'P1ReleaseR1Watchdog')]
 
     # chains of arcs
     proc1chain = ['P1CriticalSectionIn', 'P1AquireR1', 'P1HaveR1', 'P1AquireR2', 'P1Processing', 'P1Release', 'P1CriticalSectionOut']
@@ -41,12 +41,12 @@ def run():
 
     max_steps = 100
 
-    print('--------------- step', petri_net.step_num)
+    print('--------------- step', petri_net.step_num, '  time', petri_net.time)
     petri_net.print_places()
 
     while not petri_net.ended and petri_net.step_num < max_steps:
         petri_net.step()
-        print('--------------- step', petri_net.step_num)
+        print('--------------- step', petri_net.step_num, '  time', petri_net.time)
         if len(petri_net.fired):
             print(' fired: ', end='')
             print(*(t.name for t in petri_net.fired), sep=', ')

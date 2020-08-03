@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="sample_008_deadlock_priority.svg">
+   sodipodi:docname="sample_009_deadlock_P1watchdog.svg">
   <defs
      id="defs2">
     <marker
@@ -59,54 +59,6 @@
       <path
          inkscape:connector-curvature="0"
          id="path1259"
-         d="M 0,0 5,-5 -12.5,0 5,5 Z"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
-         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1243"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Arrow1Mend"
-       inkscape:collect="always">
-      <path
-         transform="matrix(-0.4,0,0,-0.4,-4,0)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
-         d="M 0,0 5,-5 -12.5,0 5,5 Z"
-         id="path1241"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1239"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Arrow1Mend"
-       inkscape:collect="always">
-      <path
-         transform="matrix(-0.4,0,0,-0.4,-4,0)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
-         d="M 0,0 5,-5 -12.5,0 5,5 Z"
-         id="path1237"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:stockid="Arrow1Mend"
-       orient="auto"
-       refY="0"
-       refX="0"
-       id="marker1235"
-       style="overflow:visible"
-       inkscape:isstock="true"
-       inkscape:collect="always">
-      <path
-         inkscape:connector-curvature="0"
-         id="path1233"
          d="M 0,0 5,-5 -12.5,0 5,5 Z"
          style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
          transform="matrix(-0.4,0,0,-0.4,-4,0)" />
@@ -550,17 +502,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2"
-     inkscape:cx="326.51647"
-     inkscape:cy="217.1"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="288.89919"
+     inkscape:cy="234.96985"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="2560"
-     inkscape:window-height="1376"
-     inkscape:window-x="1280"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1129"
+     inkscape:window-height="1010"
+     inkscape:window-x="2546"
+     inkscape:window-y="366"
+     inkscape:window-maximized="0"
      showguides="false" />
   <metadata
      id="metadata5">
@@ -942,7 +894,7 @@
        inkscape:connector-curvature="0"
        id="path979"
        d="m 97.168126,225.90706 0.0947,9.33187"
-       style="fill:none;stroke:#00ff00;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1187)" />
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1187)" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
@@ -1051,19 +1003,19 @@
          id="tspan1147">deadlock</tspan><tspan
          style="font-weight:bold;font-size:4.23333311px;line-height:3px;text-align:center;text-anchor:middle;stroke-width:0.26458332"
          y="188.463"
-         x="75.077942"
+         x="74.341034"
          sodipodi:role="line"
-         id="tspan1141">priority </tspan><tspan
+         id="tspan1151">watchdog</tspan><tspan
          style="font-weight:bold;font-size:4.23333311px;line-height:3px;text-align:center;text-anchor:middle;stroke-width:0.26458332"
          y="193.1125"
          x="74.341034"
          sodipodi:role="line"
-         id="tspan1151">retry</tspan><tspan
+         id="tspan4208">(only one</tspan><tspan
          style="font-weight:bold;font-size:4.23333311px;line-height:3px;text-align:center;text-anchor:middle;stroke-width:0.26458332"
          y="197.76202"
          x="74.341034"
          sodipodi:role="line"
-         id="tspan4208">(not working)</tspan></text>
+         id="tspan4759">process)</tspan></text>
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
@@ -1136,70 +1088,6 @@
        cx="76.406158"
        id="circle1100"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="46.394066"
-       y="239.43037"
-       id="text30233-1"><tspan
-         sodipodi:role="line"
-         id="tspan30231-0"
-         x="46.394066"
-         y="239.43037"
-         style="font-size:4.23333311px;text-align:end;text-anchor:end;stroke-width:0.26458332">p=1</tspan></text>
-    <text
-       id="text1183"
-       y="239.43037"
-       x="111.34928"
-       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       xml:space="preserve"><tspan
-         style="font-size:4.23333311px;text-align:end;text-anchor:end;stroke-width:0.26458332"
-         y="239.43037"
-         x="111.34928"
-         id="tspan1181"
-         sodipodi:role="line">p=1</tspan></text>
-    <rect
-       transform="rotate(90)"
-       y="-136.4281"
-       x="207.58531"
-       height="10.289876"
-       width="3.0735991"
-       id="rect1193"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.61515754;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1235)"
-       d="m 131.82853,207.51439 c 0.20043,-25.05127 -10.70616,-15.95573 -28.64449,-20.0661"
-       id="path1195"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:3px;font-family:sans-serif;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="126.31832"
-       y="216.63255"
-       id="text1203"><tspan
-         sodipodi:role="line"
-         id="tspan1201"
-         x="126.31832"
-         y="216.63255"
-         style="font-size:4.23333311px;line-height:3px;text-align:start;text-anchor:start;stroke-width:0.26458332">P2Release</tspan><tspan
-         sodipodi:role="line"
-         x="126.31832"
-         y="221.28206"
-         style="font-size:4.23333311px;line-height:3px;text-align:start;text-anchor:start;stroke-width:0.26458332"
-         id="tspan1217">R2Retry</tspan></text>
-    <path
-       sodipodi:nodetypes="cc"
-       inkscape:connector-curvature="0"
-       id="path1205"
-       d="m 102.65375,220.55372 c 12.03507,2.54467 17.61852,-3.87125 23.48447,-9.89479"
-       style="fill:none;stroke:#00ff00;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1239)" />
-    <path
-       sodipodi:nodetypes="cc"
-       inkscape:connector-curvature="0"
-       id="path1211"
-       d="m 128.91634,210.79122 c -22.33254,13.87897 49.07384,54.49876 -46.463148,52.14934"
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1243)" />
     <rect
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.61515754;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect1245"
@@ -1229,7 +1117,17 @@
          style="font-size:4.23333311px;line-height:3px;text-align:start;text-anchor:start;stroke-width:0.26458332"
          y="223.39873"
          x="0.6412434"
-         sodipodi:role="line">R1Retry</tspan></text>
+         sodipodi:role="line">R1Watchdog</tspan><tspan
+         style="font-size:4.23333311px;line-height:3px;text-align:start;text-anchor:start;stroke-width:0.26458332"
+         y="228.04825"
+         x="0.6412434"
+         sodipodi:role="line"
+         id="tspan4749" /><tspan
+         style="font-size:4.23333311px;line-height:3px;text-align:start;text-anchor:start;stroke-width:0.26458332"
+         y="231.04825"
+         x="0.6412434"
+         sodipodi:role="line"
+         id="tspan4751" /></text>
     <path
        style="fill:none;stroke:#ff00ff;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1265)"
        d="m 46.380943,220.81831 c -12.035073,2.54467 -17.486233,-1.49 -23.352183,-7.51354"
@@ -1242,5 +1140,16 @@
        id="path1257"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
+    <text
+       id="text1253-3"
+       y="209.32437"
+       x="1.5792321"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:3px;font-family:sans-serif;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         id="tspan1251-7"
+         style="font-size:4.23333311px;line-height:3px;text-align:start;text-anchor:start;stroke-width:0.26458332"
+         y="209.32437"
+         x="1.5792321"
+         sodipodi:role="line">t=0.1s</tspan></text>
   </g>
 </svg>

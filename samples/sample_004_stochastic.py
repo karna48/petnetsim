@@ -6,9 +6,11 @@ import numpy as np
 
 
 def run():
-    petri_net = PetriNet([Place('Z', init_tokens=10000), Place('A'), Place('B')],
+    petri_net = PetriNet([Place('Z', init_tokens=10000), 'A', 'B'],
                          [TransitionStochastic('T30', 0.3), TransitionStochastic('T70', 0.7)],
-                         [Arc('Z', 'T30'), Arc('Z', 'T70'), Arc('T30', 'A'), Arc('T70', 'B')])
+                         [('Z', 'T30'), ('Z', 'T70'), ('T30', 'A'), ('T70', 'B')])
+
+    print('conflict groups:', petri_net.conflict_groups_str)
 
     print('------------------------------------')
     print(' run')

@@ -8,17 +8,11 @@ import numpy as np
 def run():
     petri_net = PetriNet([Place('A', init_tokens=10),
                           Place('B', capacity=2),
-                          Place('C')],
-                         [Transition('T1'), Transition('T2'), Transition('T3'), Transition('T4'), Transition('T5')],
-                         [Arc('A', 'T1', 1),
-                          Arc('A', 'T2', 1),
-                          Arc('A', 'T3', 1),
-                          Arc('T1', 'C', 1),
-                          Arc('T2', 'C', 1),
-                          Arc('T3', 'B', 1),
-                          Arc('T4', 'B', 1),
-                          Arc('B', 'T5', 1),
-                          Arc('C', 'T5', 1),]
+                          'C'],
+                         ['T1', 'T2', 'T3', 'T4', 'T5'],
+                         [('A', 'T1'), ('A', 'T2'), ('A', 'T3'),
+                          ('T1', 'C'), ('T2', 'C'), ('T3', 'B'),
+                          ('T4', 'B'), ('B', 'T5'), ('C', 'T5')]
                          )
 
     print('------------------------------------')
@@ -28,7 +22,7 @@ def run():
 
     max_steps = 100
 
-    print('conflict groups:', [sorted([t.name for t in cg]) for cg in petri_net.conflict_groups_sets])
+    print('conflict groups:', petri_net.conflict_groups_str)
 
     print('--------------- step', petri_net.step_num)
     petri_net.print_places()

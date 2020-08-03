@@ -157,6 +157,12 @@ class Arc:
                 raise RuntimeError('arc to Transition must go from a Place')
             self.target.inputs.add(self)
 
+    @property
+    def target_infinite_capacity(self):
+        if not isinstance(self.target, Place):
+            raise RuntimeError('target_is_infinite can be asked only if target is a Place')
+        return self.target.capacity == Place.INF_CAPACITY
+
 
 class Inhibitor:
     _annonymous_counter = 1
