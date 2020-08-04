@@ -1,8 +1,0 @@
-; P2Release; P1AquireR1; P2AquireR2; P1AquireR2; P2AquireR1; P1ReleaseR1Retry; P2ReleaseR2Retry;
-P1Release; in: out: R1 R2; in: out:; in: out:; in: out:; in: out:; in: out: R1; in: out: R2;
-P2Release; ; in: out:; in: out:; in: out:; in: out:; in: out: R1; in: out: R2;
-P1AquireR1; ; ; in: out:; in: out:; in: R1 out:; in: out:; in: out:;
-P2AquireR2; ; ; ; in: R2 out:; in: out:; in: out:; in: out:;
-P1AquireR2; ; ; ; ; in: out:; in: P1HaveR1 out:; in: out:;
-P2AquireR1; ; ; ; ; ; in: out:; in: P2HaveR2 out:;
-P1ReleaseR1Retry; ; ; ; ; ; ; in: out:;

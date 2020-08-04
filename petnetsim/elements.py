@@ -1,14 +1,30 @@
 import random as _random
+from copy import deepcopy
+
+_default_context_init = {
+    'counters': {'P': 1, 'T': 1, 'A': 1, 'I': 1}
+}
+
+_default_context = deepcopy(_default_context_init)
+
+
+def default_context():
+    return _default_context
+
+
+def reset_default_context():
+    # preserve _default_context as same object, but deepcopy all included
+    _default_context.clear()
+    _default_context.update({k: deepcopy(v) for k, v in _default_context_init.items()})
 
 
 class Place:
     INF_CAPACITY = 0
-    _annonymous_counter = 1
 
-    def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY):
+    def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY, context=_default_context):
         if name is None:
-            self.name = 'P_'+str(Place._annonymous_counter)
-            Place._annonymous_counter += 1
+            self.name = '_P_'+str(context['counters']['P'])
+            context['counters']['P'] += 1
         else:
             self.name = name
         self.capacity = capacity
@@ -32,12 +48,10 @@ class Place:
 
 
 class Transition:
-    _annonymous_counter = 1
-
-    def __init__(self, name):
+    def __init__(self, name, context=_default_context):
         if name is None:
-            self.name = 'T_'+str(Transition._annonymous_counter)
-            Transition._annonymous_counter += 1
+            self.name = '_T_'+str(context['counters']['T'])
+            context['counters']['T'] += 1
         else:
             self.name = name
         self.inputs = set()   # Arc, Inhibitor
@@ -77,8 +91,8 @@ class Transition:
 
 
 class TransitionPriority(Transition):
-    def __init__(self, name, priority):
-        super().__init__(name)
+    def __init__(self, name, priority, context=_default_context):
+        super().__init__(name, context)
         self.priority = priority
 
 
@@ -93,8 +107,8 @@ def uniform_distribution(t_min, t_max):
 class TransitionTimed(Transition):
     T_EPSILON = 1e6
 
-    def __init__(self, name, t_min, t_max=1, p_distribution_func=constant_distribution):
-        super().__init__(name)
+    def __init__(self, name, t_min, t_max=1, p_distribution_func=constant_distribution, context=_default_context):
+        super().__init__(name, context)
         self.remaining = 0
         self.t_min = t_min
         self.t_max = t_max
@@ -121,18 +135,16 @@ class TransitionTimed(Transition):
 
 class TransitionStochastic(Transition):
     # NOTE: stochastic is almost normal transition
-    def __init__(self, name, probability):
-        super().__init__(name)
+    def __init__(self, name, probability, context=_default_context):
+        super().__init__(name, context)
         self.probability = probability
 
 
 class Arc:
-    _annonymous_counter = 1
-
-    def __init__(self, source, target, n_tokens=1, name=None):
+    def __init__(self, source, target, n_tokens=1, name=None, context=_default_context):
         if name is None:
-            self.name = 'Arc_'+str(Arc._annonymous_counter)
-            Arc._annonymous_counter += 1
+            self.name = '_Arc_'+str(context['counters']['A'])
+            context['counters']['A'] += 1
         else:
             self.name = name
         self.source = source
@@ -165,12 +177,10 @@ class Arc:
 
 
 class Inhibitor:
-    _annonymous_counter = 1
-
-    def __init__(self, source, target, n_tokens=1, name=None):
+    def __init__(self, source, target, n_tokens=1, name=None, context=_default_context):
         if name is None:
-            self.name = 'Inhibitor_'+str(Inhibitor._annonymous_counter)
-            Inhibitor._annonymous_counter += 1
+            self.name = '_Inhibitor_'+str(context['counters']['I'])
+            context['counters']['I'] += 1
         else:
             self.name = name
         self.source = source

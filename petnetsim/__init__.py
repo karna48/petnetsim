@@ -14,24 +14,32 @@ class ConflictGroupType(IntEnum):
 
 
 class PetriNet:
-    def __init__(self, places, transitions, arcs):
+    def __init__(self, places, transitions, arcs, context=default_context()):
         self._names_lookup = {}
 
-        places = [Place(p) if isinstance(p, str) else p for p in places]
+        places = [Place(p, context=context) if isinstance(p, str) else p for p in places]
 
         for p in places:
             if p.name in self._names_lookup:
                 raise RuntimeError('name reused: '+p.name)
             self._names_lookup[p.name] = p
 
-        transitions = [Transition(t) if isinstance(t, str) else t for t in transitions]
+        transitions = [Transition(t, context=context) if isinstance(t, str) else t
+                       for t in transitions]
 
         for t in transitions:
             if t.name in self._names_lookup:
                 raise RuntimeError('name reused: '+t.name)
             self._names_lookup[t.name] = t
 
-        arcs = [Arc(a[0], a[1]) if isinstance(a, tuple) else a for a in arcs]
+        def get_i(obj, i, default=1):
+            try:
+                v = obj[i]
+            except IndexError:
+                v = default
+            return v
+
+        arcs = [Arc(a[0], a[1], get_i(a, 2), context=context) if isinstance(a, (tuple, list)) else a for a in arcs]
 
         for arc in arcs:
             if arc.name in self._names_lookup:
