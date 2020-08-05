@@ -12,6 +12,10 @@ def default_context():
     return _default_context
 
 
+def new_context():
+    return deepcopy(_default_context_init)
+
+
 def reset_default_context():
     # preserve _default_context as same object, but deepcopy all included
     _default_context.clear()

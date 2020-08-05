@@ -167,6 +167,17 @@ class PetriNet:
         for p in self.places:
             print(p.name, p.tokens, sep=': ')
 
+    def print_all(self):
+        print('places:')
+        for p in self.places:
+            print('  ', p.name, p.init_tokens)
+        print('transitions:')
+        for t in self.transitions:
+            print('  ', t.name, t.__class__.__name__)
+        print('arcs:')
+        for a in self.arcs:
+            print('  ' if type(a)==Arc else ' I', a.name, a.target.name, '--'+str(a.n_tokens)+'->', a.source.name)
+
     def validate(self):
         # TODO : validation of whole net
         print('TODO: PetriNet.validate')

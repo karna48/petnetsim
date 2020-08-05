@@ -6,33 +6,60 @@ from .elements import *
 from typing import List, Dict, Union
 
 
-def load(file, opts=None):
+def load(file, context=default_context(), opts=None):
     if opts is None:
         opts = {}
 
     data = json.load(file)
+    data['places'] = {int(k): v for k, v in data['places'].items()}
+    data['transitions'] = {int(k): v for k, v in data['transitions'].items()}
+    data['arcs'] = {int(k): v for k, v in data['arcs'].items()}
     names: List[str] = data['names']
 
-    def make_place(name_idx: str, p: dict):
+    def make_place(name_idx: int, p: dict):
         name = names[name_idx]
         capacity = p.get('capacity', 'infinity')
         capacity = Place.INF_CAPACITY if capacity == 'infinity' else capacity
-        return Place(name, p.get('init_tokens', 0), capacity)
+        return Place(name, p.get('init_tokens', 0), capacity, context=context)
 
-    places = [make_place(name_idx, p) for name_idx, p in data['places'].items()]
+    places = list(itertools.starmap(make_place, data['places'].items()))
 
-    def make_transition(name_idx: str, t: dict):
+    def make_transition(name_idx: int, t: dict):
         name = names[name_idx]
         t_type = t.get('type', 'Normal')
+        # , context = context
+        return Transition(name, context=context)
 
-    transitions = []
+    transitions = list(itertools.starmap(make_transition, data['transitions'].items()))
 
-    arcs = []
+    def make_arc(name_idx: int, arc: list):
+        name = names[name_idx]
+        offset = 0
+        cls = Arc
+        if isinstance(arc[0], str):
+            if arc[0] == 'I':
+                offset = 1
+                cls = Inhibitor
+            else:
+                raise RuntimeError('unknown first string for arc:', arc[0])
+        source = names[arc[offset]]
+        target = names[arc[offset+1]]
+        try:
+            n_tokens = arc[offset+2]
+        except IndexError:
+            n_tokens = 1
+
+        return cls(source, target, n_tokens, name, context=context)
+
+    arcs = list(itertools.starmap(make_arc, data['arcs'].items()))
 
     return places, transitions, arcs
 
 
-def dump(file, places, transitions, arcs):
+def dump(file, places, transitions, arcs, opts=None):
+    if opts is None:
+        opts = {}
+
     obj_idx_lookup = {x: i for i, x in enumerate(itertools.chain(places, transitions, arcs))}
     names = [x.name for x in obj_idx_lookup.keys()]
 
@@ -51,17 +78,22 @@ def dump(file, places, transitions, arcs):
             if t.p_distribution_func == constant_distribution:
                 td.update({'t': t.t_min})
             elif t.p_distribution_func == uniform_distribution:
-                td = {'dist': 'uniform', 't_min': t.t_min, 't_max': t.t_max}
+                td.update({'dist': 'uniform', 't_min': t.t_min, 't_max': t.t_max})
+            # TODO: add exponential and normal distributions at least
             else:
-                td = {'dist': 'custom',
-                      'dist_func_name': t.p_distribution_func.__name__,
-                      't_min': t.t_min, 't_max': t.t_max}
+                if 'dist_functions' in opts:
+                    dist_func_name = opts['dist_functions'].get(t.p_distribution_func, t.p_distribution_func.__name__)
+                else:
+                    dist_func_name = t.p_distribution_func.__name__
+                td.update({'dist': 'custom',
+                           'dist_func_name': dist_func_name,
+                           't_min': t.t_min, 't_max': t.t_max})
 
             return td
         elif type(t) == TransitionPriority:
             return {'T': 'P', 'p': t.priority}
         elif type(t) == TransitionStochastic:
-            return
+            return {'T': 'S', 'p': t.probability}
         elif type(t) == Transition:
             return {}
         else:
@@ -86,15 +118,16 @@ def dump(file, places, transitions, arcs):
     json.dump({'names': names,
                'places': places_dump,
                'transitions': transitions_dump,
-               'arcs': arcs_dump})
+               'arcs': arcs_dump},
+              file)
 
 
-def loads(s):
+def loads(s, context=default_context(), opts=None):
     sio = io.StringIO(s)
-    return load(sio)
+    return load(sio, context, opts)
 
 
-def dumps(places, transitions, arcs):
+def dumps(places, transitions, arcs, opts=None):
     sio = io.StringIO()
-    dump(sio, places, transitions, arcs)
+    dump(sio, places, transitions, arcs, opts)
     return sio.getvalue()
