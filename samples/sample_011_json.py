@@ -2,6 +2,7 @@ from petnetsim import PetriNet
 from petnetsim.elements import *
 from petnetsim.json_io import loads, dumps
 from pprint import pprint
+from itertools import chain
 import json
 
 ctx = new_context()
@@ -44,6 +45,8 @@ petri_net = \
         context=ctx)
 
 petri_net_dump = dumps(petri_net.places, petri_net.transitions, petri_net.arcs)
+print(petri_net_dump)
+print('-----------------------------------------------')
 
 data = json.loads(petri_net_dump)
 data['places'] = {int(k): v for k, v in data['places'].items()}
@@ -64,6 +67,57 @@ petri_net_from_dump.print_all()
 
 def compare_petri_nets(pn1, pn2):
     diff = []
+
+    def make_lookup(pn: PetriNet):
+        return {x.name: x for x in chain(pn.places, pn.transitions, pn.arcs)}
+
+    def items_differ(x1, x2):
+        if type(x1) != type(x2):
+            return ('type_mismatch', x1.name, str(type(x1), '!=', str(type(x2))))
+        if type(x1) == Place:
+            if x1.capacity != x2.capacity or x1.init_tokens != x2.init_tokens:
+                return (x1.name, 'place parameters mismatch',
+                        (x1.capacity, x1.init_tokens),
+                        '!=',
+                        (x2.capacity, x2.init_tokens))
+        elif isinstance(x1, Transition):  # and subclasses
+            # inputs/outputs
+            x1_sources = {arc.source.name for arc in x1.inputs}
+            x2_sources = {arc.source.name for arc in x2.inputs}
+            mismatched_sources = x1_sources.symmetric_difference(x2_sources)
+
+            x1_targets = {arc.target.name for arc in x1.outputs}
+            x2_targets = {arc.target.name for arc in x2.outputs}
+            mismatched_targets = x1_targets.symmetric_difference(x2_targets)
+
+            if len(mismatched_sources) or len(mismatched_targets):
+                return (x1.name,
+                        'transition has mismatched inputs/outputs',
+                        ('bad inputs:', mismatched_sources),
+                        ('bad outputs:', mismatched_targets))
+        elif isinstance(x1, (Arc, Inhibitor)):
+            if x1.source.name != x2.source.name or x1.target.name != x2.target.name:
+                return (x1.name,
+                        'arc/inhibitor source/target mismatched',
+                        (x1.source.name, x2.source.name),
+                        (x1.target.name, x2.target.name))
+
+        return False
+
+    L1 = make_lookup(pn1)
+    L2 = make_lookup(pn2)
+
+    mismatched_names = set(L1.keys()).symmetric_difference(L2.keys())
+    if len(mismatched_names):
+        diff.append(('mismatched names', mismatched_names))
+
+    for name, x1 in L1.items():
+        x2 = L2[name]
+        di = items_differ(x1, x2)
+        if di:
+            diff.append(di)
+
+    return diff
 
 
 diff = compare_petri_nets(petri_net, petri_net_from_dump)

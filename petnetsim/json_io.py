@@ -1,7 +1,6 @@
 import json
 import io
-import itertools
-from . import PetriNet, ConflictGroupType
+from itertools import starmap, chain
 from .elements import *
 from typing import List, Dict, Union
 
@@ -22,15 +21,43 @@ def load(file, context=default_context(), opts=None):
         capacity = Place.INF_CAPACITY if capacity == 'infinity' else capacity
         return Place(name, p.get('init_tokens', 0), capacity, context=context)
 
-    places = list(itertools.starmap(make_place, data['places'].items()))
+    places = list(starmap(make_place, data['places'].items()))
 
     def make_transition(name_idx: int, t: dict):
         name = names[name_idx]
-        t_type = t.get('type', 'Normal')
-        # , context = context
-        return Transition(name, context=context)
+        t_type = t.get('T', 'N')
+        if t_type == 'T':
+            dist = t.get('dist', 'constant')
+            if dist == 'constant':
+                dist_func = constant_distribution
+                t_min = t['t']
+                t_max = 1  # unused value
+            elif dist == 'uniform':
+                dist_func = uniform_distribution
+                t_min = t['t_min']
+                t_max = t['t_max']
+            elif dist == 'custom':
+                dfs = opts.get('dist_functions', {})
+                dfn = t['dist_func_name']
+                dfuncs = [func for func, fname in dfs.items() if fname == dfn]
+                t_min = t['t_min']
+                t_max = t['t_max']
+                if len(dfuncs) == 1:
+                    dist_func = dfuncs[0]
+                else:
+                    raise RuntimeError('error in opts dist_functions for function: '+dfn)
 
-    transitions = list(itertools.starmap(make_transition, data['transitions'].items()))
+            return TransitionTimed(name, t_min, t_max, dist_func, context=context)
+        elif t_type == 'P':
+            return TransitionPriority(name, t['p'], context=context)
+        elif t_type == 'S':
+            return TransitionStochastic(name, t['p'], context=context)
+        elif t_type == 'N':
+            return Transition(name, context=context)
+        else:
+            raise RuntimeError('unknown transition type: '+str(t_type))
+
+    transitions = list(starmap(make_transition, data['transitions'].items()))
 
     def make_arc(name_idx: int, arc: list):
         name = names[name_idx]
@@ -51,16 +78,15 @@ def load(file, context=default_context(), opts=None):
 
         return cls(source, target, n_tokens, name, context=context)
 
-    arcs = list(itertools.starmap(make_arc, data['arcs'].items()))
+    arcs = list(starmap(make_arc, data['arcs'].items()))
 
     return places, transitions, arcs
 
 
 def dump(file, places, transitions, arcs, opts=None):
-    if opts is None:
-        opts = {}
+    opts = {} if opts is None else opts
 
-    obj_idx_lookup = {x: i for i, x in enumerate(itertools.chain(places, transitions, arcs))}
+    obj_idx_lookup = {x: i for i, x in enumerate(chain(places, transitions, arcs))}
     names = [x.name for x in obj_idx_lookup.keys()]
 
     def dump_place(p: Place):
