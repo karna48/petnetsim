@@ -29,8 +29,6 @@ class Editor(QGraphicsView):
         self.test_transition_item.setPos(80, 0)
         self.scene().addItem(self.test_transition_item)
 
-
-
     def select(self, item):
         print(self.selected, item)
         if self.selected == item:

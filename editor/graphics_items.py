@@ -4,29 +4,29 @@ from PyQt5.QtCore import *
 from .scene import PetriNetScene
 from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, Inhibitor
 from typing import Union, List
-from . import Editor
+from math import atan2
 
 
-class ConnectSlots(QGraphicsItemGroup):
+class Port(QGraphicsRectItem):
     RECT_SIZE = QSizeF(8.0, 8.0)
 
-    def __init__(self, points: List[QPointF]):
-        super().__init__()
-        self.rects = [QGraphicsRectItem() for p in points]
-        for r in self.rects:
-            self.addToGroup(r)
+    def __init__(self, center: QPointF, assoc_obj, assoc_item, editor):
+        v = QPointF(Port.RECT_SIZE/2, Port.RECT_SIZE/2)
+        r = QRectF(center-v, center+v)
+        super().__init__(r)
+        self.assoc_obj = assoc_obj
+        self.assoc_item = assoc_item
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
-            self.editor.select(self)
-            print('ConnectSlots mouse pressed, event accepted')
+            print('Port mouse pressed, event accepted')
             event.accept()
 
 
 class PlaceItem(QGraphicsItemGroup):
     CIRCLE_RADIUS = 20
 
-    def __init__(self, place: Place, editor: Editor):
+    def __init__(self, place: Place, editor):
         super().__init__()
         self.place = place  # source Place object
         self.editor = editor
@@ -93,7 +93,7 @@ class TransitionItem(QGraphicsItemGroup):
 
     def __init__(self,
                  transition: Union[Transition, TransitionTimed, TransitionPriority, TransitionStochastic],
-                 editor: Editor):
+                 editor):
         super().__init__()
         self.transition = transition  # source Place object
         self.editor = editor
@@ -142,22 +142,28 @@ class TransitionItem(QGraphicsItemGroup):
 
 
 class ArcItem(QGraphicsItemGroup):
+    ARC_END = '►'
+    INHIBITOR_END = '◯'
+
     def __init__(self,
                  arc: Union[Arc, Inhibitor],
-                 editor: Editor):
+                 source: Port, target: Port,
+                 editor):
         super().__init__()
-        self.arc = arc  # source Place object
         self.editor = editor
         self.setFlag(QGraphicsItem.ItemIsMovable)
 
-#        self.line =
-        #self.rect_select = QGraphicsRectItem(-12., -22.5, 12, 46)
-        self.name_text = QGraphicsSimpleTextItem('name')
-        self.attribute_text = QGraphicsSimpleTextItem('attribute')
+        self.source = source
+        self.target = target
+
+        self.line = QGraphicsLineItem()
+        self.end_shape = QGraphicsSimpleTextItem('END')
+        self.n_tokens_text = QGraphicsSimpleTextItem('attribute')
         #self.is_selected = False
         #self.rect_select.setBrush()
         self.is_selected = True
         #self.rect_select.setVisible(self.is_selected)
+
 
         self.normal_pen = QPen(QColor('black'), 1)
         self.selected_pen = QPen(QColor('red'), 3)
@@ -172,16 +178,36 @@ class ArcItem(QGraphicsItemGroup):
         self.addToGroup(self.name_text)
         self.addToGroup(self.attribute_text)
 
+        self.set_arc_or_inhibitor(arc)
+        self.update_ports()
+
+    def set_arc_or_inhibitor(self, arc: Union[Arc, Inhibitor]):
+        self.arc = arc
+        if type(arc) == Arc:
+            self.end_shape.setText(ArcItem.ARC_END)
+        else:
+            self.end_shape.setText(ArcItem.INHIBITOR_END)
+
+    def update_ports(self):
+        p1 = self.source.scenePos()
+        p2 = self.target.scenePos()
+        self.line.setLine(QLineF(p1, p2))
+        v = p2-p1
+        angle = atan2(v.y(), v.x())
+        self.end_shape.setRotation(angle)
+        self.end_shape.setPos(p2)
+
     def set_selected(self, b):
         self.is_selected = b
         self.rect.setPen(self.selected_pen if self.is_selected else self.normal_pen)
 
     def update_texts(self):
-        self.name_text.setText(self.transition.name)
-        self.name_text.setPos(-6*len(self.transition.name)/2, -50)
-        s = 'U(1~3.2)s'
-        self.attribute_text.setText(s)
-        self.attribute_text.setPos(-6*len(s)/2, -40)
+        p1 = self.source.scenePos()
+        p2 = self.target.scenePos()
+        v = p1 + (p2 - p1) / 2
+        s = str(self.arc.n_tokens)
+        self.n_tokens_text.setText(s)
+        self.n_tokens_text.setPos(v.x-6*len(s)/2, v.y-20)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
