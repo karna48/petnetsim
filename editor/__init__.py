@@ -2,7 +2,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from .scene import PetriNetScene
 from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, Inhibitor
 from typing import Union
 from .graphics_items import PlaceItem, TransitionItem, ArcItem
@@ -12,7 +11,7 @@ class Editor(QGraphicsView):
     def __init__(self):
         super().__init__()
 
-        self.setScene(PetriNetScene())
+        self.setScene(QGraphicsScene())
 
         self.selected = None
 
@@ -28,6 +27,13 @@ class Editor(QGraphicsView):
         self.test_transition_item = TransitionItem(test_transition, self)
         self.test_transition_item.setPos(80, 0)
         self.scene().addItem(self.test_transition_item)
+
+        test_arc = Arc(test_place, test_transition, 3)
+        self.test_arc_item = ArcItem(test_arc,
+                                     self.test_place_item.ports[2],
+                                     self.test_transition_item.ports[0],
+                                     self)
+        self.scene().addItem(self.test_arc_item)
 
     def select(self, item):
         print(self.selected, item)
