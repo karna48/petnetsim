@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, Inhibitor
-from typing import Union, List
+from typing import Union, List, Any
 from math import sin, cos, atan2, pi
 import numpy as np
 
@@ -21,11 +21,6 @@ class Port(QGraphicsRectItem):
         self.assoc_item = assoc_item
         self.setBrush(Port.BRUSH)
 
-    def contains(self, point):
-        point += self.pos()
-        result = super().contains(point)
-        return result
-
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         print('port mousePressEvent')
         if event.button() == Qt.LeftButton:
@@ -41,6 +36,7 @@ class PlaceItem(QGraphicsItemGroup):
         self.place = place  # source Place object
         self.editor = editor
         self.setFlag(QGraphicsItem.ItemIsMovable)
+        self.setFlag(QGraphicsItem.ItemSendsScenePositionChanges)
 
         r = PlaceItem.CIRCLE_RADIUS
 
@@ -71,13 +67,20 @@ class PlaceItem(QGraphicsItemGroup):
         for p in self.ports:
             self.addToGroup(p)
 
+        self.hide_ports()
         self.set_selected(self.is_selected)
+
+    def show_ports(self):
+        for p in self.ports:
+            p.setVisible(True)
+
+    def hide_ports(self):
+        for p in self.ports:
+            p.setVisible(False)
 
     def set_selected(self, b):
         self.is_selected = b
         self.circle_select.setVisible(b)
-        for p in self.ports:
-            p.setVisible(b)
 
     def update_texts(self):
         self.name_text.setText(self.place.name)
@@ -91,19 +94,20 @@ class PlaceItem(QGraphicsItemGroup):
         s = 'C='+str(self.place.capacity)
         self.capacity_text.setText(s)
         self.capacity_text.setPos(-6*len(s)/2, 20)
+        self.capacity_text.setVisible(self.place.capacity != Place.INF_CAPACITY)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
             if self.is_selected:
                 print('PlaceItem mouse pressed, trying ports')
-                point_local = event.pos()
+                point = event.scenePos()
                 for p in self.ports:
-                    if p.contains(point_local):
-                        print(point_local, 'contained !!!')
+                    if p.contains(p.mapFromScene(point)):
+                        print(point, 'contained !!!')
                         p.mousePressEvent(event)
                         break
                     else:
-                        print(point_local, 'not contained')
+                        print(point, 'not contained')
             else:
                 self.editor.select(self)
                 print('PlaceItem mouse pressed and accepted')
@@ -115,6 +119,12 @@ class PlaceItem(QGraphicsItemGroup):
         v.normalize()
         v *= r
         return self.pos() + v.toPointF()
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
+        if change == QGraphicsItem.ItemPositionChange:
+            self.editor.item_moved(self.place)
+
+        return super().itemChange(change, value)
 
 
 class TransitionItem(QGraphicsItemGroup):
@@ -130,6 +140,7 @@ class TransitionItem(QGraphicsItemGroup):
         self.transition = transition  # source Place object
         self.editor = editor
         self.setFlag(QGraphicsItem.ItemIsMovable)
+        self.setFlag(QGraphicsItem.ItemSendsScenePositionChanges)
 
         w, h = TransitionItem.RECT_WIDTH, TransitionItem.RECT_HEIGHT
 
@@ -146,19 +157,25 @@ class TransitionItem(QGraphicsItemGroup):
         self.addToGroup(self.name_text)
         self.addToGroup(self.attribute_text)
 
-        n_ports = 8
         self.ports = [Port(QPointF(x, y),
                            self.transition, self, editor)
-                      for x, y in ((-w, 0), (w, 0), (w, 0))]
+                      for x, y in ((-w/2, 0), (w/2, 0),
+                                   (-w/2, +h/3), (w/2, +h/3),
+                                   (-w/2, -h/3), (w/2, -h/3))]
 
         for p in self.ports:
             self.addToGroup(p)
 
+        self.hide_ports()
         self.set_selected(self.is_selected)
 
     def show_ports(self):
         for p in self.ports:
-            p.setVisible(b)
+            p.setVisible(True)
+
+    def hide_ports(self):
+        for p in self.ports:
+            p.setVisible(False)
 
     def set_selected(self, b):
         self.is_selected = b
@@ -186,10 +203,14 @@ class TransitionItem(QGraphicsItemGroup):
 
         return self.pos() + v.toPointF()
 
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
+        if change == QGraphicsItem.ItemPositionChange:
+            self.editor.item_moved(self.transition)
+
+        return super().itemChange(change, value)
+
 
 class ArcItem(QGraphicsItemGroup):
-    ARC_END = '►'
-    INHIBITOR_END = '◯'
     normal_pen = QPen(QColor('black'), 1)
     selected_pen = QPen(QColor('red'), 3)
 
@@ -204,8 +225,21 @@ class ArcItem(QGraphicsItemGroup):
         self.source = source
         self.target = target
 
+        arrow_path = QPainterPath()
+
+        arrow_path.addPolygon(
+            QPolygonF(
+                (QPointF(0, 0),
+                 QPointF(-8, -3),
+                 QPointF(-8, +3),
+                 QPointF(0, 0)
+                 )
+            )
+        )
+
         self.line = QGraphicsLineItem()
-        self.end_shape = QGraphicsSimpleTextItem('END')
+        self.end_shape = QGraphicsPathItem(arrow_path)
+        self.end_shape.setBrush(QColor('black'))
         self.n_tokens_text = QGraphicsSimpleTextItem('n_tokens')
         self.is_selected = False
 
@@ -222,32 +256,32 @@ class ArcItem(QGraphicsItemGroup):
 
     def set_arc_or_inhibitor(self, arc: Union[Arc, Inhibitor]):
         self.arc = arc
-        if type(arc) == Arc:
-            self.end_shape.setText(ArcItem.ARC_END)
-        else:
-            self.end_shape.setText(ArcItem.INHIBITOR_END)
+        # if type(arc) == Arc:
+        #     self.end_shape.setText(ArcItem.ARC_END)
+        # else:
+        #     self.end_shape.setText(ArcItem.INHIBITOR_END)
 
-    def update_ports(self):
+    def update_ports(self, p2: QPointF = None):
         p1 = self.source.scenePos()
-        p2 = self.target.scenePos()
-        self.line.setLine(QLineF(p1, p2))
-        v = p2-p1
-        self.n_tokens_text.setPos(p1.x()+v.x()/2, p1.x()+v.y()/2-20)
-        angle = atan2(v.y(), v.x())
-        self.end_shape.setRotation(angle)
-        self.end_shape.setPos(p2.x(), p2.y()-10)
+        p2 = p2 if p2 is None else self.target.scenePos()
+        line = QLineF(p1, p2)
+        self.line.setLine(line)
+        center: QPointF = line.center()
+        s = str(self.arc.n_tokens)
+        self.n_tokens_text.setPos(center.x()-6*len(s)/2, center.y()-20)
+        self.end_shape.setRotation(-line.angle())
+        self.end_shape.setPos(p2.x(), p2.y())
 
     def set_selected(self, b):
         self.is_selected = b
         self.line.setPen(ArcItem.selected_pen if self.is_selected else ArcItem.normal_pen)
 
     def update_texts(self):
-        p1 = self.source.scenePos()
-        p2 = self.target.scenePos()
-        v = p1 + (p2 - p1) / 2
+        center: QPointF = self.line.line().center()
         s = str(self.arc.n_tokens)
         self.n_tokens_text.setText(s)
-        self.n_tokens_text.setPos(v.x()-6*len(s)/2, v.y()-20)
+        self.n_tokens_text.setPos(center.x()-6*len(s)/2, center.y()-20)
+        self.n_tokens_text.setVisible(self.arc.n_tokens > 1)
 
     def shape(self) -> QPainterPath:
         pp = QPainterPath()
