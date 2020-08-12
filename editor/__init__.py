@@ -19,18 +19,23 @@ class Editor(QGraphicsView):
         self.transition_items = []
         self.arc_items = []
 
-        test_place = Place('PlaceA', 5, capacity=3)
-        self.test_place_item = PlaceItem(test_place, self)
-        self.scene().addItem(self.test_place_item)
+        place_A = Place('PlaceA', 5, capacity=3)
+        self.place_A_item = PlaceItem(place_A, self)
+        self.scene().addItem(self.place_A_item)
+
+        place_B = Place('B', 2)
+        self.place_B_item = PlaceItem(place_B, self)
+        self.scene().addItem(self.place_B_item)
+        self.place_B_item.setPos(0, 100)
 
         test_transition = Transition('T1')
         self.test_transition_item = TransitionItem(test_transition, self)
         self.test_transition_item.setPos(80, 0)
         self.scene().addItem(self.test_transition_item)
 
-        test_arc = Arc(test_place, test_transition, 3)
+        test_arc = Arc(place_A, test_transition, 3)
         self.test_arc_item = ArcItem(test_arc,
-                                     self.test_place_item.ports[2],
+                                     self.place_A_item.ports[0],
                                      self.test_transition_item.ports[0],
                                      self)
         self.scene().addItem(self.test_arc_item)
@@ -59,10 +64,10 @@ class Editor(QGraphicsView):
             self.select(None)
 
         if key_event.key() == ord('X'):
-            print(self.test_place_item.pos())
+            print(self.place_A_item.pos())
 
         if key_event.key() == ord('S'):
-            self.test_place_item.set_selected(not self.test_place_item.is_selected)
+            self.place_A_item.set_selected(not self.place_A_item.is_selected)
 
         if key_event.key() == ord('A'):
             print('add arc')

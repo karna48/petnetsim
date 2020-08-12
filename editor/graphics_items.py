@@ -8,19 +8,26 @@ import numpy as np
 
 
 class Port(QGraphicsRectItem):
-    RECT_SIZE = QSizeF(8.0, 8.0)
+    RECT_SIZE = QSizeF(10.0, 10.0)
     BRUSH = QBrush(QColor('white'))
 
     def __init__(self, center: QPointF, assoc_obj, assoc_item, editor):
         # TODO: set position to center, make the rect centered at 0
         v = QPointF(Port.RECT_SIZE.width()/2, Port.RECT_SIZE.height()/2)
-        r = QRectF(center-v, center+v)
+        r = QRectF(-v, Port.RECT_SIZE)
         super().__init__(r)
+        self.setPos(center)
         self.assoc_obj = assoc_obj
         self.assoc_item = assoc_item
         self.setBrush(Port.BRUSH)
 
+    def contains(self, point):
+        point += self.pos()
+        result = super().contains(point)
+        return result
+
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+        print('port mousePressEvent')
         if event.button() == Qt.LeftButton:
             print('Port mouse pressed, event accepted')
             event.accept()
@@ -87,9 +94,20 @@ class PlaceItem(QGraphicsItemGroup):
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
-            self.editor.select(self)
-            print('item mouse pressed')
-            event.accept()
+            if self.is_selected:
+                print('PlaceItem mouse pressed, trying ports')
+                point_local = event.pos()
+                for p in self.ports:
+                    if p.contains(point_local):
+                        print(point_local, 'contained !!!')
+                        p.mousePressEvent(event)
+                        break
+                    else:
+                        print(point_local, 'not contained')
+            else:
+                self.editor.select(self)
+                print('PlaceItem mouse pressed and accepted')
+                event.accept()
 
     def connection_point(self, point: QPointF):
         r = PlaceItem.CIRCLE_RADIUS
@@ -138,11 +156,13 @@ class TransitionItem(QGraphicsItemGroup):
 
         self.set_selected(self.is_selected)
 
+    def show_ports(self):
+        for p in self.ports:
+            p.setVisible(b)
+
     def set_selected(self, b):
         self.is_selected = b
         self.rect.setPen(TransitionItem.selected_pen if self.is_selected else TransitionItem.normal_pen)
-        for p in self.ports:
-            p.setVisible(b)
 
     def update_texts(self):
         w, h = TransitionItem.RECT_WIDTH, TransitionItem.RECT_HEIGHT
@@ -154,6 +174,7 @@ class TransitionItem(QGraphicsItemGroup):
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
+            print('TransitionItem mouse pressed and accepted')
             self.editor.select(self)
             event.accept()
 
@@ -186,7 +207,7 @@ class ArcItem(QGraphicsItemGroup):
         self.line = QGraphicsLineItem()
         self.end_shape = QGraphicsSimpleTextItem('END')
         self.n_tokens_text = QGraphicsSimpleTextItem('n_tokens')
-        self.is_selected = True
+        self.is_selected = False
 
         self.set_arc_or_inhibitor(arc)
         self.update_texts()
@@ -228,8 +249,22 @@ class ArcItem(QGraphicsItemGroup):
         self.n_tokens_text.setText(s)
         self.n_tokens_text.setPos(v.x()-6*len(s)/2, v.y()-20)
 
+    def shape(self) -> QPainterPath:
+        pp = QPainterPath()
+        rect = self.line.boundingRect()
+        if rect.width() < 5:
+            rem = 5 - rect.width()
+            rect.setX(rect.x()+rem/2)
+            rect.setWidth(rect.width()+rem)
+        if rect.height() < 5:
+            rem = 5 - rect.height()
+            rect.setY(rect.y()+rem/2)
+            rect.setHeight(rect.height()+rem)
+        pp.addRect(rect)
+        return pp
+
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
             self.editor.select(self)
-            print('item mouse pressed')
+            print('ArcItem mouse pressed and accepted')
             event.accept()
