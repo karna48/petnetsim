@@ -12,10 +12,11 @@ class Port(QGraphicsRectItem):
     NormalBrush = QBrush(QColor('white'))
     SelectedBrush = QBrush(QColor('blue'))
 
-    def __init__(self, center: QPointF, assoc_obj, assoc_item, editor):
+    def __init__(self, center: QPointF, assoc_obj, assoc_item, editor, number):
         v = QPointF(Port.RectSize.width() / 2, Port.RectSize.height() / 2)
         r = QRectF(-v, Port.RectSize)
         super().__init__(r)
+        self.number = number
         self.setPos(center)
         self.assoc_obj = assoc_obj
         self.assoc_item = assoc_item
@@ -49,8 +50,8 @@ class PlaceItem(QGraphicsItemGroup):
 
         n_ports = 8
         self.ports = [Port(QPointF(r*cos(alpha), r*sin(alpha)),
-                           self.place, self, editor)
-                      for alpha in np.linspace(0, 2*pi*(n_ports-1)/n_ports, n_ports)]
+                           self.place, self, editor, i)
+                      for i, alpha in enumerate(np.linspace(0, 2*pi*(n_ports-1)/n_ports, n_ports))]
 
         self.addToGroup(self.circle)
         self.addToGroup(self.circle_select)
@@ -131,10 +132,12 @@ class TransitionItem(QGraphicsItemGroup):
         self.addToGroup(self.attribute_text)
 
         self.ports = [Port(QPointF(x, y),
-                           self.transition, self, editor)
-                      for x, y in ((-w/2, 0), (w/2, 0),
-                                   (-w/2, +h/3), (w/2, +h/3),
-                                   (-w/2, -h/3), (w/2, -h/3))]
+                           self.transition, self, editor, i)
+                      for i, (x, y) in
+                        enumerate(
+                            ((-w/2, 0), (w/2, 0),
+                             (-w/2, +h/3), (w/2, +h/3),
+                             (-w/2, -h/3), (w/2, -h/3)))]
 
         for p in self.ports:
             self.addToGroup(p)

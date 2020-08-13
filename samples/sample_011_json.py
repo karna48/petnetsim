@@ -57,7 +57,7 @@ pprint(data, indent=4, compact=True, width=200)
 
 ctx2 = new_context()
 
-p2_places, p2_transitions, p2_arcs = loads(petri_net_dump, ctx2)
+p2_places, p2_transitions, p2_arcs, _ = loads(petri_net_dump, ctx2)
 
 petri_net_from_dump = PetriNet(p2_places, p2_transitions, p2_arcs)
 
@@ -66,14 +66,14 @@ petri_net_from_dump.print_all()
 
 
 def compare_petri_nets(pn1, pn2):
-    diff = []
+    nets_difference = []
 
     def make_lookup(pn: PetriNet):
         return {x.name: x for x in chain(pn.places, pn.transitions, pn.arcs)}
 
     def items_differ(x1, x2):
         if type(x1) != type(x2):
-            return ('type_mismatch', x1.name, str(type(x1), '!=', str(type(x2))))
+            return 'type_mismatch', x1.name, str(type(x1), '!=', str(type(x2)))
         if type(x1) == Place:
             if x1.capacity != x2.capacity or x1.init_tokens != x2.init_tokens:
                 return (x1.name, 'place parameters mismatch',
@@ -104,20 +104,20 @@ def compare_petri_nets(pn1, pn2):
 
         return False
 
-    L1 = make_lookup(pn1)
-    L2 = make_lookup(pn2)
+    lookup_1 = make_lookup(pn1)
+    lookup_2 = make_lookup(pn2)
 
-    mismatched_names = set(L1.keys()).symmetric_difference(L2.keys())
+    mismatched_names = set(lookup_1.keys()).symmetric_difference(lookup_2.keys())
     if len(mismatched_names):
-        diff.append(('mismatched names', mismatched_names))
+        nets_difference.append(('mismatched names', mismatched_names))
 
-    for name, x1 in L1.items():
-        x2 = L2[name]
+    for name, x1 in lookup_1.items():
+        x2 = lookup_2[name]
         di = items_differ(x1, x2)
         if di:
-            diff.append(di)
+            nets_difference.append(di)
 
-    return diff
+    return nets_difference
 
 
 diff = compare_petri_nets(petri_net, petri_net_from_dump)

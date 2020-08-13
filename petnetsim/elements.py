@@ -84,8 +84,9 @@ class Transition:
         self.fired_times += 1
 
     def freeze(self):
-        self.inputs = frozenset(self.inputs)
-        self.outputs = frozenset(self.outputs)
+        # todo no freezing for editing!
+        # self.inputs = frozenset(self.inputs)
+        # self.outputs = frozenset(self.outputs)
         self.in_arcs = tuple(arc for arc in self.inputs if isinstance(arc, Arc))
         self.inhibitors = tuple(inhibitor for inhibitor in self.inputs if isinstance(inhibitor, Inhibitor))
         # note: inhibitors can't be outputs

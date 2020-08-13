@@ -6,6 +6,10 @@ from petnetsim import *
 
 
 def run():
+    empty_net = PetriNet([], [], [])
+    while not empty_net.ended and empty_net.step_num < 1000:
+        empty_net.step()
+
     petri_net = PetriNet([Place('A', init_tokens=6),
                           Place('B', init_tokens=4),
                           Place('C'),

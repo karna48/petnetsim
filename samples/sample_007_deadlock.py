@@ -11,14 +11,14 @@ def run():
     process_states = [Place(p+'CriticalSectionIn', 1) for p in ['P1', 'P2']] + \
                      ['P1HaveR1', 'P2HaveR2'] + \
                      [p+s for p, s in itertools.product(['P1', 'P2'], ['Processing', 'CriticalSectionOut'])]
-    transitions = [p+s for p, s in itertools.product(['P1', 'P2'], ['AquireR1', 'AquireR2', 'Release'])]
+    transitions = [p+s for p, s in itertools.product(['P1', 'P2'], ['AcquireR1', 'AcquireR2', 'Release'])]
 
-    arcs = [('R1', 'P1AquireR1'), ('R1', 'P2AquireR1'), ('R2', 'P1AquireR2'), ('R2', 'P2AquireR2'),
+    arcs = [('R1', 'P1AcquireR1'), ('R1', 'P2AcquireR1'), ('R2', 'P1AcquireR2'), ('R2', 'P2AcquireR2'),
             ('P1Release', 'R1'), ('P1Release', 'R2'), ('P2Release', 'R1'), ('P2Release', 'R2')]
 
     # chains of arcs
-    proc1chain = ['P1CriticalSectionIn', 'P1AquireR1', 'P1HaveR1', 'P1AquireR2', 'P1Processing', 'P1Release', 'P1CriticalSectionOut']
-    proc2chain = ['P2CriticalSectionIn', 'P2AquireR2', 'P2HaveR2', 'P2AquireR1', 'P2Processing', 'P2Release', 'P2CriticalSectionOut']
+    proc1chain = ['P1CriticalSectionIn', 'P1AcquireR1', 'P1HaveR1', 'P1AcquireR2', 'P1Processing', 'P1Release', 'P1CriticalSectionOut']
+    proc2chain = ['P2CriticalSectionIn', 'P2AcquireR2', 'P2HaveR2', 'P2AcquireR1', 'P2Processing', 'P2Release', 'P2CriticalSectionOut']
 
     for pc in [proc1chain, proc2chain]:
         for s, t in zip(pc[:-1], pc[1:]):

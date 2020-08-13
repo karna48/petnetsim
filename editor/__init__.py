@@ -1,8 +1,10 @@
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, Inhibitor
+import petnetsim.json_io as json_io
+from petnetsim import PetriNet
+from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, \
+    Inhibitor
 from typing import Union
 from itertools import chain
 from collections import defaultdict
@@ -15,10 +17,12 @@ class Editor(QGraphicsView):
         Normal = 0
         ArcSource = 1
         ArcTarget = 2
+        Simulation = 100
 
-    ModeStrings = {Mode.Normal: 'Normal',
+    ModeStrings = {Mode.Normal: 'Normal editing',
                    Mode.ArcSource: 'Arc source',
-                   Mode.ArcTarget: 'Arc target'}
+                   Mode.ArcTarget: 'Arc target',
+                   Mode.Simulation: 'Simulation'}
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -30,7 +34,7 @@ class Editor(QGraphicsView):
         self.arc_lookup = defaultdict(list)
         self.arc_mode_tmp = None
 
-        self.selected = None
+        self.selected: Union[None, PlaceItem, TransitionItem, ArcItem] = None
 
         self.place_items = []
         self.transition_items = []
@@ -40,6 +44,22 @@ class Editor(QGraphicsView):
 
     def after_init(self, main_window):
         self.main_window = main_window
+        self.mode = self._mode  # update text label
+
+    def verify_petrinet(self, toggled=None, inform_success=True) -> bool:
+        try:
+            pn = PetriNet([item.place for item in self.place_items],
+                          [item.transition for item in self.transition_items],
+                          [item.arc for item in self.arc_items])
+            msg = f'{len(pn.places)} places, {len(pn.transitions)} transitions, {len(pn.arcs)} arcs'
+            if inform_success:
+                QMessageBox.information(None, 'verification success', msg)
+            return True
+        except Exception as e:
+            msg = type(e).__name__ + ': ' + str(e)
+            print(msg)
+            QMessageBox.warning(None, 'verification failed', msg)
+            return False
 
     @property
     def mode(self):
@@ -55,13 +75,14 @@ class Editor(QGraphicsView):
         for arc_item in self.arc_lookup[assoc_obj]:
             arc_item.update_ports()
 
-    def add_place(self):
-        place = Place()
+    def add_place(self, place=None):
+        if place is None:
+            place = Place()
         place_item = PlaceItem(place, self)
         place_item.setPos(self.last_mouse_scene_pos)
         self.scene().addItem(place_item)
         self.place_items.append(place_item)
-        self.select(place_item)
+        return place_item
 
     def delete_place_item(self, place_item):
         to_delete = self.arc_lookup[place_item.place].copy()
@@ -71,13 +92,14 @@ class Editor(QGraphicsView):
         self.place_items.remove(place_item)
         self.scene().removeItem(place_item)
 
-    def add_transition(self):
-        transition = Transition(None)
+    def add_transition(self, transition=None):
+        if transition is None:
+            transition = Transition(None)
         transition_item = TransitionItem(transition, self)
         transition_item.setPos(self.last_mouse_scene_pos)
         self.scene().addItem(transition_item)
         self.transition_items.append(transition_item)
-        self.select(transition_item)
+        return transition_item
 
     def delete_transition_item(self, transition_item):
         to_delete = self.arc_lookup[transition_item.transition].copy()
@@ -87,13 +109,15 @@ class Editor(QGraphicsView):
         self.transition_items.remove(transition_item)
         self.scene().removeItem(transition_item)
 
-    def add_arc(self, source_port: Port, target_port: Port, n_tokens=1):
-        arc = Arc(source_port.assoc_obj, target_port.assoc_obj, n_tokens)
+    def add_arc(self, source_port: Port, target_port: Port, n_tokens=1, arc=None):
+        if arc is None:
+            arc = Arc(source_port.assoc_obj, target_port.assoc_obj, n_tokens)
         arc_item = ArcItem(arc, source_port, target_port, self)
         self.scene().addItem(arc_item)
         self.arc_items.append(arc_item)
         self.arc_lookup[source_port.assoc_obj].append(arc_item)
         self.arc_lookup[target_port.assoc_obj].append(arc_item)
+        return arc_item
 
     def delete_arc_item(self, arc_item):
         self.arc_lookup[arc_item.source.assoc_obj].remove(arc_item)
@@ -160,11 +184,13 @@ class Editor(QGraphicsView):
 
         if key_event.key() == Qt.Key_P:
             if self.mode == Editor.Mode.Normal:
-                self.add_place()
+                place_item = self.add_place()
+                self.select(place_item)
 
         if key_event.key() == Qt.Key_T:
             if self.mode == Editor.Mode.Normal:
-                self.add_transition()
+                transition_item = self.add_transition()
+                self.select(transition_item)
 
         if key_event.key() == Qt.Key_A:
             if self.mode == Editor.Mode.Normal:
@@ -187,6 +213,63 @@ class Editor(QGraphicsView):
             pass
         elif self.mode == Editor.Mode.ArcTarget:
             pass
+
+    def save_petrinet(self, file):
+        graphics = {}
+        places = []
+        for pi in self.place_items:
+            places.append(pi.place)
+            dsc = [pi.pos().x(), pi.pos().y()]
+            graphics[pi.place] = dsc
+        transitions = []
+        for ti in self.transition_items:
+            transitions.append(ti.transition)
+            dsc = [ti.pos().x(), ti.pos().y()]
+            graphics[ti.transition] = dsc
+        arcs = []
+        ai: ArcItem
+        for ai in self.arc_items:
+            arcs.append(ai.arc)
+            dsc = [ai.source.number, ai.target.number]
+            graphics[ai.arc] = dsc
+
+        json_io.dump(file, places, transitions, arcs, graphics)
+
+    def clear(self):
+        to_delete = self.place_items.copy()
+        for p in to_delete:
+            self.delete_place_item(p)
+        to_delete = self.transition_items.copy()
+        for t in to_delete:
+            self.delete_transition_item(t)
+        self.arc_lookup.clear()
+
+    def load_petrinet(self, file):
+        self.clear()
+        places, transitions, arcs, graphics = json_io.load(file)
+        obj_item_lookup = {}
+        names_lookup = {}
+        for p in places:
+            names_lookup[p.name] = p
+            item = self.add_place(p)
+            obj_item_lookup[p] = item
+            g = graphics[p]
+            item.setPos(g[0], g[1])
+        for t in transitions:
+            names_lookup[t.name] = t
+            item = self.add_transition(t)
+            g = graphics[t]
+            obj_item_lookup[t] = item
+            item.setPos(g[0], g[1])
+
+        for a in arcs:
+            a.connect(names_lookup)
+            source_item = obj_item_lookup[a.source]
+            target_item = obj_item_lookup[a.target]
+            g = graphics[a]
+            source_port = source_item.ports[g[0]]
+            target_port = target_item.ports[g[1]]
+            item = self.add_arc(source_port, target_port, arc=a)
 
 
 class ArcModeTemporary:

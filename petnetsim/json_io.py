@@ -13,13 +13,21 @@ def load(file, context=default_context(), opts=None):
     data['places'] = {int(k): v for k, v in data['places'].items()}
     data['transitions'] = {int(k): v for k, v in data['transitions'].items()}
     data['arcs'] = {int(k): v for k, v in data['arcs'].items()}
+    graphics = data.get('graphics', None)
     names: List[str] = data['names']
+
+    obj_lookup = {}
+
+    if graphics is not None:
+        graphics = {int(k): v for k, v in graphics.items()}
 
     def make_place(name_idx: int, p: dict):
         name = names[name_idx]
         capacity = p.get('capacity', 'infinity')
         capacity = Place.INF_CAPACITY if capacity == 'infinity' else capacity
-        return Place(name, p.get('init_tokens', 0), capacity, context=context)
+        place = Place(name, p.get('init_tokens', 0), capacity, context=context)
+        obj_lookup[name_idx] = place
+        return place
 
     places = list(starmap(make_place, data['places'].items()))
 
@@ -46,14 +54,21 @@ def load(file, context=default_context(), opts=None):
                     dist_func = dfuncs[0]
                 else:
                     raise RuntimeError('error in opts dist_functions for function: '+dfn)
-
-            return TransitionTimed(name, t_min, t_max, dist_func, context=context)
+            transition = TransitionTimed(name, t_min, t_max, dist_func, context=context)
+            obj_lookup[name_idx] = transition
+            return transition
         elif t_type == 'P':
-            return TransitionPriority(name, t['p'], context=context)
+            transition = TransitionPriority(name, t['p'], context=context)
+            obj_lookup[name_idx] = transition
+            return transition
         elif t_type == 'S':
-            return TransitionStochastic(name, t['p'], context=context)
+            transition = TransitionStochastic(name, t['p'], context=context)
+            obj_lookup[name_idx] = transition
+            return transition
         elif t_type == 'N':
-            return Transition(name, context=context)
+            transition = Transition(name, context=context)
+            obj_lookup[name_idx] = transition
+            return transition
         else:
             raise RuntimeError('unknown transition type: '+str(t_type))
 
@@ -75,15 +90,19 @@ def load(file, context=default_context(), opts=None):
             n_tokens = arc[offset+2]
         except IndexError:
             n_tokens = 1
-
-        return cls(source, target, n_tokens, name, context=context)
+        arc = cls(source, target, n_tokens, name, context=context)
+        obj_lookup[name_idx] = arc
+        return arc
 
     arcs = list(starmap(make_arc, data['arcs'].items()))
 
-    return places, transitions, arcs
+    if graphics is not None:
+        graphics = {obj_lookup[name_idx]: g for name_idx, g in graphics.items()}
+
+    return places, transitions, arcs, graphics
 
 
-def dump(file, places, transitions, arcs, opts=None):
+def dump(file, places, transitions, arcs, graphics, opts=None):
     opts = {} if opts is None else opts
 
     obj_idx_lookup = {x: i for i, x in enumerate(chain(places, transitions, arcs))}
@@ -135,17 +154,21 @@ def dump(file, places, transitions, arcs, opts=None):
         elif type(a) == Inhibitor:
             return ['I'] + v
         else:
-            raise RuntimeError('unknown arc type: ', str(type(t)))
+            raise RuntimeError('unknown arc type: ', str(type(a)))
 
     places_dump = {obj_idx_lookup[p]: dump_place(p) for p in places}
     transitions_dump = {obj_idx_lookup[t]: dump_transition(t) for t in transitions}
     arcs_dump = {obj_idx_lookup[a]: dump_arc(a) for a in arcs}
 
-    json.dump({'names': names,
-               'places': places_dump,
-               'transitions': transitions_dump,
-               'arcs': arcs_dump},
-              file)
+    data = {'names': names,
+            'places': places_dump,
+            'transitions': transitions_dump,
+            'arcs': arcs_dump}
+
+    if graphics is not None:
+        data['graphics'] = {obj_idx_lookup[obj]: g for obj, g in graphics.items()}
+
+    json.dump(data, file, indent=2)
 
 
 def loads(s, context=default_context(), opts=None):
@@ -153,7 +176,7 @@ def loads(s, context=default_context(), opts=None):
     return load(sio, context, opts)
 
 
-def dumps(places, transitions, arcs, opts=None):
+def dumps(places, transitions, arcs, graphics=None, opts=None):
     sio = io.StringIO()
-    dump(sio, places, transitions, arcs, opts)
+    dump(sio, places, transitions, arcs, graphics, opts)
     return sio.getvalue()
