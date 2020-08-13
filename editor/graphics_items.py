@@ -8,28 +8,40 @@ import numpy as np
 
 
 class Port(QGraphicsRectItem):
-    RECT_SIZE = QSizeF(10.0, 10.0)
-    BRUSH = QBrush(QColor('white'))
+    RectSize = QSizeF(10.0, 10.0)
+    NormalBrush = QBrush(QColor('white'))
+    SelectedBrush = QBrush(QColor('blue'))
 
     def __init__(self, center: QPointF, assoc_obj, assoc_item, editor):
-        # TODO: set position to center, make the rect centered at 0
-        v = QPointF(Port.RECT_SIZE.width()/2, Port.RECT_SIZE.height()/2)
-        r = QRectF(-v, Port.RECT_SIZE)
+        v = QPointF(Port.RectSize.width() / 2, Port.RectSize.height() / 2)
+        r = QRectF(-v, Port.RectSize)
         super().__init__(r)
         self.setPos(center)
         self.assoc_obj = assoc_obj
         self.assoc_item = assoc_item
-        self.setBrush(Port.BRUSH)
+        self.setBrush(Port.NormalBrush)
 
-    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
-        print('port mousePressEvent')
-        if event.button() == Qt.LeftButton:
-            print('Port mouse pressed, event accepted')
-            event.accept()
+
+def selectable_with_ports_mousePressEvent(item, event):
+    Editor = item.editor.__class__
+    if event.button() == Qt.LeftButton:
+        if item.editor.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
+            point = event.scenePos()
+            for port_item in item.ports:
+                if port_item.contains(port_item.mapFromScene(point)):
+                    item.editor.select_port(port_item)
+                    break
+
+        elif item.editor.mode == Editor.Mode.Normal:
+            if item.is_selected:
+                pass
+            else:
+                item.editor.select(item)
+                event.accept()
 
 
 class PlaceItem(QGraphicsItemGroup):
-    CIRCLE_RADIUS = 20
+    CircleRadius = 20
 
     def __init__(self, place: Place, editor):
         super().__init__()
@@ -38,9 +50,9 @@ class PlaceItem(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsScenePositionChanges)
 
-        r = PlaceItem.CIRCLE_RADIUS
+        r = PlaceItem.CircleRadius
 
-        self.circle_select = QGraphicsEllipseItem(-r-4, -r-4, 2*r+8, 2*r+8)
+        self.circle_select = QGraphicsEllipseItem(-r-4, -r-4, 2*r+8.5, 2*r+8.5)
         self.circle = QGraphicsEllipseItem(-r, -r, 2*r, 2*r)
         self.tokens_text = QGraphicsSimpleTextItem('')
         self.capacity_text = QGraphicsSimpleTextItem('')
@@ -97,24 +109,10 @@ class PlaceItem(QGraphicsItemGroup):
         self.capacity_text.setVisible(self.place.capacity != Place.INF_CAPACITY)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
-        if event.button() == Qt.LeftButton:
-            if self.is_selected:
-                print('PlaceItem mouse pressed, trying ports')
-                point = event.scenePos()
-                for p in self.ports:
-                    if p.contains(p.mapFromScene(point)):
-                        print(point, 'contained !!!')
-                        p.mousePressEvent(event)
-                        break
-                    else:
-                        print(point, 'not contained')
-            else:
-                self.editor.select(self)
-                print('PlaceItem mouse pressed and accepted')
-                event.accept()
+        selectable_with_ports_mousePressEvent(self, event)
 
     def connection_point(self, point: QPointF):
-        r = PlaceItem.CIRCLE_RADIUS
+        r = PlaceItem.CircleRadius
         v: QVector2D = (self.pos() - point)
         v.normalize()
         v *= r
@@ -128,10 +126,10 @@ class PlaceItem(QGraphicsItemGroup):
 
 
 class TransitionItem(QGraphicsItemGroup):
-    RECT_WIDTH = 12
-    RECT_HEIGHT = 46
-    normal_pen = QPen(QColor('black'), 1)
-    selected_pen = QPen(QColor('red'), 3)
+    RectWidth = 12
+    RectHeight = 46
+    NormalPen = QPen(QColor('black'), 1)
+    SelectedPen = QPen(QColor('red'), 3)
 
     def __init__(self,
                  transition: Union[Transition, TransitionTimed, TransitionPriority, TransitionStochastic],
@@ -142,7 +140,7 @@ class TransitionItem(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsScenePositionChanges)
 
-        w, h = TransitionItem.RECT_WIDTH, TransitionItem.RECT_HEIGHT
+        w, h = TransitionItem.RectWidth, TransitionItem.RectHeight
 
         self.rect = QGraphicsRectItem(-w/2, -h/2, w, h)
         self.name_text = QGraphicsSimpleTextItem('name')
@@ -179,10 +177,10 @@ class TransitionItem(QGraphicsItemGroup):
 
     def set_selected(self, b):
         self.is_selected = b
-        self.rect.setPen(TransitionItem.selected_pen if self.is_selected else TransitionItem.normal_pen)
+        self.rect.setPen(TransitionItem.SelectedPen if self.is_selected else TransitionItem.NormalPen)
 
     def update_texts(self):
-        w, h = TransitionItem.RECT_WIDTH, TransitionItem.RECT_HEIGHT
+        w, h = TransitionItem.RectWidth, TransitionItem.RectHeight
         self.name_text.setText(self.transition.name)
         self.name_text.setPos(-6*len(self.transition.name)/2, -h/2-30)
         s = 'U(1~3.2)s'
@@ -190,10 +188,7 @@ class TransitionItem(QGraphicsItemGroup):
         self.attribute_text.setPos(-6*len(s)/2, h/2+5)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
-        if event.button() == Qt.LeftButton:
-            print('TransitionItem mouse pressed and accepted')
-            self.editor.select(self)
-            event.accept()
+        selectable_with_ports_mousePressEvent(self, event)
 
     def connection_point(self, point: QPointF):
         v: QVector2D = (self.pos() - point)
@@ -211,8 +206,8 @@ class TransitionItem(QGraphicsItemGroup):
 
 
 class ArcItem(QGraphicsItemGroup):
-    normal_pen = QPen(QColor('black'), 1)
-    selected_pen = QPen(QColor('red'), 3)
+    NormalPen = QPen(QColor('black'), 1)
+    SelectedPen = QPen(QColor('red'), 3)
 
     def __init__(self,
                  arc: Union[Arc, Inhibitor],
@@ -263,7 +258,7 @@ class ArcItem(QGraphicsItemGroup):
 
     def update_ports(self, p2: QPointF = None):
         p1 = self.source.scenePos()
-        p2 = p2 if p2 is None else self.target.scenePos()
+        p2 = p2 if p2 is not None else self.target.scenePos()
         line = QLineF(p1, p2)
         self.line.setLine(line)
         center: QPointF = line.center()
@@ -274,7 +269,7 @@ class ArcItem(QGraphicsItemGroup):
 
     def set_selected(self, b):
         self.is_selected = b
-        self.line.setPen(ArcItem.selected_pen if self.is_selected else ArcItem.normal_pen)
+        self.line.setPen(ArcItem.SelectedPen if self.is_selected else ArcItem.NormalPen)
 
     def update_texts(self):
         center: QPointF = self.line.line().center()

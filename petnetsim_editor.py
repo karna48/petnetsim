@@ -1,17 +1,17 @@
+from PyQt5 import uic
 from PyQt5.QtWidgets import *
 import sys
 import editor
 import petnetsim
 
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        uic.loadUi('editor/petnetsim.ui', self)
 
-        self.editor = editor.Editor()
-
-        self.setCentralWidget(self.editor)
+        #self.editor = editor.Editor()
+        #self.setCentralWidget(self.editor)
 
 
 

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, Inhibitor
-from typing import Union, DefaultDict
+from typing import Union
 from itertools import chain
 from collections import defaultdict
 from .graphics_items import PlaceItem, TransitionItem, ArcItem, Port
@@ -16,16 +16,15 @@ class Editor(QGraphicsView):
         ArcSource = 1
         ArcTarget = 2
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.setScene(QGraphicsScene())
         self.setMouseTracking(True)
 
         self.mode = Editor.Mode.Normal
 
         self.arc_lookup = defaultdict(list)
-        self.arc_mode_data = {'source_port': None, 'target_port': None}
-
+        self.arc_mode_tmp = None
 
         self.selected = None
 
@@ -33,37 +32,40 @@ class Editor(QGraphicsView):
         self.transition_items = []
         self.arc_items = []
 
-        place_A = Place('A', 5, capacity=3)
-        self.place_A_item = PlaceItem(place_A, self)
-        self.scene().addItem(self.place_A_item)
-        self.place_items.append(self.place_A_item)
-
-        place_B = Place('B', 2)
-        self.place_B_item = PlaceItem(place_B, self)
-        self.scene().addItem(self.place_B_item)
-        self.place_B_item.setPos(0, 100)
-        self.place_items.append(self.place_B_item)
-
-        place_C = Place('C')
-        self.place_C_item = PlaceItem(place_C, self)
-        self.scene().addItem(self.place_C_item)
-        self.place_C_item.setPos(150, 20)
-        self.place_items.append(self.place_C_item)
-
-        test_transition = Transition('T1')
-        self.test_transition_item = TransitionItem(test_transition, self)
-        self.test_transition_item.setPos(80, 0)
-        self.scene().addItem(self.test_transition_item)
-        self.place_items.append(self.test_transition_item)
-
-        self.add_arc(self.place_A_item.ports[0], self.test_transition_item.ports[0], 3)
-        self.add_arc(self.place_B_item.ports[7], self.test_transition_item.ports[2], 1)
-        self.add_arc(self.test_transition_item.ports[1], self.place_C_item.ports[5], 1)
+        self.last_mouse_scene_pos = QPointF()
 
     def item_moved(self, assoc_obj):
         arc_item: ArcItem
         for arc_item in self.arc_lookup[assoc_obj]:
             arc_item.update_ports()
+
+    def add_place(self):
+        place = Place()
+        place_item = PlaceItem(place, self)
+        place_item.setPos(self.last_mouse_scene_pos)
+        self.scene().addItem(place_item)
+        self.place_items.append(place_item)
+        self.select(place_item)
+
+    def delete_place(self, place_item):
+        # use arc_lookup with ports;
+        # delete all connected arcs!
+        #place_item
+        pass
+
+    def add_transition(self):
+        transition = Transition(None)
+        transition_item = TransitionItem(transition, self)
+        transition_item.setPos(self.last_mouse_scene_pos)
+        self.scene().addItem(transition_item)
+        self.transition_items.append(transition_item)
+        self.select(transition_item)
+
+    def delete_transition(self, transition_item):
+        # use arc_lookup with ports;
+        # delete all connected arcs!
+        #transition_item
+        pass
 
     def add_arc(self, source_port: Port, target_port: Port, n_tokens=1):
         arc = Arc(source_port.assoc_obj, target_port.assoc_obj, n_tokens)
@@ -80,14 +82,23 @@ class Editor(QGraphicsView):
         self.arc_items.remove(arc_item)
 
     def select(self, item):
-        print(self.selected, item)
-        if self.selected == item:
-            return
-        if self.selected is not None:
-            self.selected.set_selected(False)
-        self.selected = item
-        if item is not None:
-            item.set_selected(True)
+        if self.mode == Editor.Mode.Normal:
+            if self.selected == item:
+                return
+            if self.selected is not None:
+                self.selected.set_selected(False)
+            self.selected = item
+            if item is not None:
+                item.set_selected(True)
+
+    def select_port(self, port: Port):
+        if self.mode == Editor.Mode.ArcSource:
+            self.arc_mode_tmp = ArcModeTemporary(port, self)
+            self.mode = Editor.Mode.ArcTarget
+        elif self.mode == Editor.Mode.ArcTarget:
+            if self.arc_mode_tmp.connect_target(port):
+                self.arc_mode_tmp = None
+                self.mode = self.mode.ArcSource  # can make new arcs until A is pressed
 
     def mousePressEvent(self, event: QMouseEvent):
         if self.mode == Editor.Mode.Normal:
@@ -96,45 +107,89 @@ class Editor(QGraphicsView):
 
             if not event.isAccepted() and event.button() == Qt.LeftButton:
                 self.select(None)
-
         elif self.mode == Editor.Mode.ArcSource:
-            pass
+            super().mousePressEvent(event)
+        elif self.mode == Editor.Mode.ArcTarget:
+            super().mousePressEvent(event)
 
     def keyPressEvent(self, key_event: QKeyEvent):
         if key_event.isAutoRepeat():
             return  # no autorepeats!
 
+        def cancel_arc_modes():
+            for item in chain(self.place_items, self.transition_items):
+                item.hide_ports()
+            if self.arc_mode_tmp is not None:
+                self.arc_mode_tmp.cancel()
+                self.arc_mode_tmp = None
+
         if key_event.key() == Qt.Key_Escape:
             self.select(None)
+            if self.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
+                cancel_arc_modes()
+                self.mode = Editor.Mode.Normal
 
-        if key_event.key() == ord('X'):
-            print(self.place_A_item.pos())
+        if key_event.key() == ord('P'):
+            if self.mode == Editor.Mode.Normal:
+                self.add_place()
 
-        if key_event.key() == ord('S'):
-            self.place_A_item.set_selected(not self.place_A_item.is_selected)
+        if key_event.key() == ord('T'):
+            if self.mode == Editor.Mode.Normal:
+                self.add_transition()
 
         if key_event.key() == ord('A'):
             if self.mode == Editor.Mode.Normal:
                 for item in chain(self.place_items, self.transition_items):
                     item.show_ports()
-
                 self.mode = Editor.Mode.ArcSource
-
+            elif self.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
+                cancel_arc_modes()
+                self.mode = Editor.Mode.Normal
 
     def keyReleaseEvent(self, key_event: QKeyEvent):
         if key_event.isAutoRepeat():
             return  # no autorepeats!
 
-        if key_event.key() == ord('A'):
-            if self.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
-                self.mode = Editor.Mode.Normal
-
-            for item in chain(self.place_items, self.transition_items):
-                item.hide_ports()
-
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        if self.mode == Editor.Mode.ArcTarget:
+        self.last_mouse_scene_pos = self.mapToScene(event.pos())
+        if self.mode == Editor.Mode.Normal:
+            super().mouseMoveEvent(event)
+        elif self.mode == Editor.Mode.ArcSource:
+            pass
+        elif self.mode == Editor.Mode.ArcTarget:
+            pass
 
 
+class ArcModeTemporary:
+    def __init__(self, source_port: Port, editor: Editor):
+        self.source_port = source_port
+        self.editor = editor
+        self.source_port.setBrush(Port.SelectedBrush)
 
+    def connect_target(self, target_port: Port):
+        target_is_place = isinstance(target_port.assoc_obj, Place)
+        target_is_transition = isinstance(target_port.assoc_obj, Transition)
+        source_is_place = isinstance(self.source_port.assoc_obj, Place)
+        source_is_transition = isinstance(self.source_port.assoc_obj, Transition)
+        if (target_is_place and source_is_place) or (target_is_transition and source_is_transition):
+            print('ERROR: cannot connect two places or two transitions')
+            return False
 
+        for arc_item in self.editor.arc_items:
+            # no duplicities and backward arcs!
+            same_source = arc_item.source.assoc_obj == self.source_port.assoc_obj
+            same_target = arc_item.target.assoc_obj == target_port.assoc_obj
+            reversed_st = arc_item.source.assoc_obj == target_port.assoc_obj
+            reversed_ts = arc_item.target.assoc_obj == self.source_port.assoc_obj
+            if (same_source and same_target) or (reversed_st and reversed_ts):
+                print('ERROR: already connected')
+                return False
+
+        self.source_port.setBrush(Port.NormalBrush)
+        self.editor.add_arc(self.source_port, target_port)
+        return True
+
+    def cancel(self):
+        print('ArcModeTemporary cancel')
+        self.source_port.setBrush(Port.NormalBrush)
+        self.source_port = None
