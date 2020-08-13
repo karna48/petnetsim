@@ -41,7 +41,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0">
        <property name="spacing">
         <number>3</number>
        </property>
@@ -55,9 +55,16 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="mode_label">
+        <widget class="QLabel" name="mode_t_label">
          <property name="text">
           <string>Mode</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="mode_label">
+         <property name="text">
+          <string>Normal</string>
          </property>
         </widget>
        </item>
@@ -138,7 +145,7 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QStackedWidget" name="properties_stackedWidget">
+     <widget class="ItemProperties" name="properties_stackedWidget">
       <property name="maximumSize">
        <size>
         <width>300</width>
@@ -152,7 +159,7 @@
        <enum>QFrame::Raised</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="empty_props_page">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -169,7 +176,7 @@
        </layout>
       </widget>
       <widget class="QWidget" name="place_props_page">
-       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0">
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0">
         <item row="1" column="1">
          <widget class="QLineEdit" name="place_name_lineEdit"/>
         </item>
@@ -180,6 +187,9 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="place_init_tokens_spinBox"/>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
@@ -187,14 +197,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="place_init_tokens_lineEdit">
-          <property name="text">
-           <string>0</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Current tokens</string>
@@ -217,8 +220,8 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="label_4">
+        <item row="4" column="1">
+         <widget class="QLabel" name="place_current_tokens_label">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -230,7 +233,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0" colspan="2">
+        <item row="5" column="0" colspan="2">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -242,6 +245,20 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Capacity</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="place_capacity_spinBox">
+          <property name="maximum">
+           <number>1000000000</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -263,7 +280,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Transition&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;b&gt;Transition&lt;/b&gt;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -284,7 +301,7 @@
          </spacer>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="place_name_lineEdit_2"/>
+         <widget class="QLineEdit" name="transition_name_lineEdit"/>
         </item>
         <item row="3" column="0" colspan="2">
          <widget class="QStackedWidget" name="transition_types_stackedWidget">
@@ -318,7 +335,83 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="arc_props_page"/>
+      <widget class="QWidget" name="arc_props_page">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="label_9">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>&lt;b&gt;Arc&lt;/b&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="arc_name_lineEdit"/>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QComboBox" name="arc_type_comboBox">
+          <item>
+           <property name="text">
+            <string>Normal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Inhibitor</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Tokens</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="arc_tokens_spinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>100000000</number>
+          </property>
+          <property name="value">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item row="2" column="1">
@@ -349,7 +442,7 @@ steps...
      </widget>
     </item>
     <item row="3" column="0" colspan="2">
-     <widget class="QLabel" name="label_8">
+     <widget class="QLabel" name="shortcuts_help_label">
       <property name="text">
        <string>A: toggle arc mode   P: add place   T: add transition    Del: delete selected</string>
       </property>
@@ -391,6 +484,12 @@ steps...
    <class>Editor</class>
    <extends>QGraphicsView</extends>
    <header>editor.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ItemProperties</class>
+   <extends>QStackedWidget</extends>
+   <header>editor.widgets.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

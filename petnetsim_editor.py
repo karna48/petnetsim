@@ -10,6 +10,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         uic.loadUi('editor/petnetsim.ui', self)
 
+        self.editor.after_init(self)
+
         #self.editor = editor.Editor()
         #self.setCentralWidget(self.editor)
 

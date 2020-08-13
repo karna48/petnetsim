@@ -16,12 +16,16 @@ class Editor(QGraphicsView):
         ArcSource = 1
         ArcTarget = 2
 
+    ModeStrings = {Mode.Normal: 'Normal',
+                   Mode.ArcSource: 'Arc source',
+                   Mode.ArcTarget: 'Arc target'}
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setScene(QGraphicsScene())
         self.setMouseTracking(True)
 
-        self.mode = Editor.Mode.Normal
+        self._mode = Editor.Mode.Normal
 
         self.arc_lookup = defaultdict(list)
         self.arc_mode_tmp = None
@@ -33,6 +37,18 @@ class Editor(QGraphicsView):
         self.arc_items = []
 
         self.last_mouse_scene_pos = QPointF()
+
+    def after_init(self, main_window):
+        self.main_window = main_window
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @mode.setter
+    def mode(self, v):
+        self._mode = v
+        self.main_window.mode_label.setText(Editor.ModeStrings[self._mode])
 
     def item_moved(self, assoc_obj):
         arc_item: ArcItem
@@ -47,11 +63,13 @@ class Editor(QGraphicsView):
         self.place_items.append(place_item)
         self.select(place_item)
 
-    def delete_place(self, place_item):
-        # use arc_lookup with ports;
-        # delete all connected arcs!
-        #place_item
-        pass
+    def delete_place_item(self, place_item):
+        to_delete = self.arc_lookup[place_item.place].copy()
+        for arc_item in to_delete:
+            self.delete_arc_item(arc_item)
+        self.arc_lookup.pop(place_item.place)
+        self.place_items.remove(place_item)
+        self.scene().removeItem(place_item)
 
     def add_transition(self):
         transition = Transition(None)
@@ -61,11 +79,13 @@ class Editor(QGraphicsView):
         self.transition_items.append(transition_item)
         self.select(transition_item)
 
-    def delete_transition(self, transition_item):
-        # use arc_lookup with ports;
-        # delete all connected arcs!
-        #transition_item
-        pass
+    def delete_transition_item(self, transition_item):
+        to_delete = self.arc_lookup[transition_item.transition].copy()
+        for arc_item in to_delete:
+            self.delete_arc_item(arc_item)
+        self.arc_lookup.pop(transition_item.transition)
+        self.transition_items.remove(transition_item)
+        self.scene().removeItem(transition_item)
 
     def add_arc(self, source_port: Port, target_port: Port, n_tokens=1):
         arc = Arc(source_port.assoc_obj, target_port.assoc_obj, n_tokens)
@@ -129,15 +149,24 @@ class Editor(QGraphicsView):
                 cancel_arc_modes()
                 self.mode = Editor.Mode.Normal
 
-        if key_event.key() == ord('P'):
+        if key_event.key() == Qt.Key_Delete:
+            if self.mode == Editor.Mode.Normal:
+                if isinstance(self.selected, PlaceItem):
+                    self.delete_place_item(self.selected)
+                elif isinstance(self.selected, TransitionItem):
+                    self.delete_transition_item(self.selected)
+                elif isinstance(self.selected, ArcItem):
+                    self.delete_arc_item(self.selected)
+
+        if key_event.key() == Qt.Key_P:
             if self.mode == Editor.Mode.Normal:
                 self.add_place()
 
-        if key_event.key() == ord('T'):
+        if key_event.key() == Qt.Key_T:
             if self.mode == Editor.Mode.Normal:
                 self.add_transition()
 
-        if key_event.key() == ord('A'):
+        if key_event.key() == Qt.Key_A:
             if self.mode == Editor.Mode.Normal:
                 for item in chain(self.place_items, self.transition_items):
                     item.show_ports()

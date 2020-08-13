@@ -22,24 +22,6 @@ class Port(QGraphicsRectItem):
         self.setBrush(Port.NormalBrush)
 
 
-def selectable_with_ports_mousePressEvent(item, event):
-    Editor = item.editor.__class__
-    if event.button() == Qt.LeftButton:
-        if item.editor.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
-            point = event.scenePos()
-            for port_item in item.ports:
-                if port_item.contains(port_item.mapFromScene(point)):
-                    item.editor.select_port(port_item)
-                    break
-
-        elif item.editor.mode == Editor.Mode.Normal:
-            if item.is_selected:
-                pass
-            else:
-                item.editor.select(item)
-                event.accept()
-
-
 class PlaceItem(QGraphicsItemGroup):
     CircleRadius = 20
 
@@ -110,13 +92,6 @@ class PlaceItem(QGraphicsItemGroup):
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         selectable_with_ports_mousePressEvent(self, event)
-
-    def connection_point(self, point: QPointF):
-        r = PlaceItem.CircleRadius
-        v: QVector2D = (self.pos() - point)
-        v.normalize()
-        v *= r
-        return self.pos() + v.toPointF()
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
         if change == QGraphicsItem.ItemPositionChange:
@@ -189,14 +164,6 @@ class TransitionItem(QGraphicsItemGroup):
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         selectable_with_ports_mousePressEvent(self, event)
-
-    def connection_point(self, point: QPointF):
-        v: QVector2D = (self.pos() - point)
-        if v.x() >= 0:
-            if v.y() >= v.y():
-                pass
-
-        return self.pos() + v.toPointF()
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
         if change == QGraphicsItem.ItemPositionChange:
@@ -297,3 +264,21 @@ class ArcItem(QGraphicsItemGroup):
             self.editor.select(self)
             print('ArcItem mouse pressed and accepted')
             event.accept()
+
+
+def selectable_with_ports_mousePressEvent(item, event):
+    from . import Editor
+    if event.button() == Qt.LeftButton:
+        if item.editor.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
+            point = event.scenePos()
+            for port_item in item.ports:
+                if port_item.contains(port_item.mapFromScene(point)):
+                    item.editor.select_port(port_item)
+                    break
+
+        elif item.editor.mode == Editor.Mode.Normal:
+            if item.is_selected:
+                pass
+            else:
+                item.editor.select(item)
+                event.accept()
