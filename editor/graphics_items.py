@@ -5,6 +5,7 @@ from petnetsim.elements import Place, Transition, TransitionPriority, Transition
 from typing import Union, List, Any
 from math import sin, cos, atan2, pi
 import numpy as np
+from .mode import Mode
 
 
 class Port(QGraphicsRectItem):
@@ -270,16 +271,15 @@ class ArcItem(QGraphicsItemGroup):
 
 
 def selectable_with_ports_mousePressEvent(item, event):
-    from . import Editor
     if event.button() == Qt.LeftButton:
-        if item.editor.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
+        if item.editor.main_window.mode in (Mode.ArcSource, Mode.ArcTarget):
             point = event.scenePos()
             for port_item in item.ports:
                 if port_item.contains(port_item.mapFromScene(point)):
                     item.editor.select_port(port_item)
                     break
 
-        elif item.editor.mode == Editor.Mode.Normal:
+        elif item.editor.main_window.mode == Mode.Normal:
             if item.is_selected:
                 pass
             else:

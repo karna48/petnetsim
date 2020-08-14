@@ -41,7 +41,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0,0,0,0,0">
        <property name="spacing">
         <number>3</number>
        </property>
@@ -76,7 +76,39 @@
         </widget>
        </item>
        <item>
+        <widget class="Line" name="line">
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="lineWidth">
+          <number>2</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Simulation</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="simulation_run_pushButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Run</string>
          </property>
@@ -136,6 +168,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="simulation_step_pushButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Step</string>
          </property>
@@ -143,6 +178,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="simulation_reset_pushButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Reset</string>
          </property>
@@ -152,7 +190,7 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="ItemProperties" name="properties_stackedWidget">
+     <widget class="ItemProperties" name="item_properties">
       <property name="maximumSize">
        <size>
         <width>300</width>
@@ -504,7 +542,7 @@ steps...
    <extends>QGraphicsView</extends>
    <header>editor.h</header>
    <slots>
-    <slot>verify_petrinet()</slot>
+    <slot>verified_petrinet()</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -520,17 +558,36 @@ steps...
    <sender>verify_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>editor</receiver>
-   <slot>verify_petrinet()</slot>
+   <slot>verified_petrinet()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1253</x>
-     <y>40</y>
+     <x>620</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1244</x>
-     <y>90</y>
+     <x>411</x>
+     <y>366</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>simulation_editor_switched(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>711</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>733</x>
+     <y>-7</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>simulation_editor_switched(bool)</slot>
+ </slots>
 </ui>

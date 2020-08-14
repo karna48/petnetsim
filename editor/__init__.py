@@ -3,33 +3,25 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import petnetsim.json_io as json_io
 from petnetsim import PetriNet
-from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, \
-    Inhibitor
+from petnetsim.elements import Place, Transition, \
+    TransitionPriority, TransitionTimed, TransitionStochastic, \
+    Arc, Inhibitor
 from typing import Union
 from itertools import chain
 from collections import defaultdict
 from .graphics_items import PlaceItem, TransitionItem, ArcItem, Port
 import enum
+from .mode import Mode
+from .widgets import find_main_window
 
 
 class Editor(QGraphicsView):
-    class Mode(enum.IntEnum):
-        Normal = 0
-        ArcSource = 1
-        ArcTarget = 2
-        Simulation = 100
-
-    ModeStrings = {Mode.Normal: 'Normal editing',
-                   Mode.ArcSource: 'Arc source',
-                   Mode.ArcTarget: 'Arc target',
-                   Mode.Simulation: 'Simulation'}
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setScene(QGraphicsScene())
         self.setMouseTracking(True)
 
-        self._mode = Editor.Mode.Normal
+        self.main_window = find_main_window(self)
 
         self.arc_lookup = defaultdict(list)
         self.arc_mode_tmp = None
@@ -42,11 +34,7 @@ class Editor(QGraphicsView):
 
         self.last_mouse_scene_pos = QPointF()
 
-    def after_init(self, main_window):
-        self.main_window = main_window
-        self.mode = self._mode  # update text label
-
-    def verify_petrinet(self, toggled=None, inform_success=True) -> bool:
+    def verified_petrinet(self, toggled=None, inform_success=True) -> Union[PetriNet, None]:
         try:
             pn = PetriNet([item.place for item in self.place_items],
                           [item.transition for item in self.transition_items],
@@ -54,21 +42,20 @@ class Editor(QGraphicsView):
             msg = f'{len(pn.places)} places, {len(pn.transitions)} transitions, {len(pn.arcs)} arcs'
             if inform_success:
                 QMessageBox.information(None, 'verification success', msg)
-            return True
+            return pn
         except Exception as e:
             msg = type(e).__name__ + ': ' + str(e)
             print(msg)
             QMessageBox.warning(None, 'verification failed', msg)
-            return False
+            return None
 
     @property
     def mode(self):
-        return self._mode
+        return self.main_window.mode
 
     @mode.setter
-    def mode(self, v):
-        self._mode = v
-        self.main_window.mode_label.setText(Editor.ModeStrings[self._mode])
+    def mode(self, new_mode):
+        self.main_window.mode = new_mode
 
     def item_moved(self, assoc_obj):
         arc_item: ArcItem
@@ -126,55 +113,55 @@ class Editor(QGraphicsView):
         self.arc_items.remove(arc_item)
 
     def select(self, item):
-        if self.mode == Editor.Mode.Normal:
+        if self.mode == Mode.Normal:
             if self.selected == item:
                 return
             if self.selected is not None:
                 self.selected.set_selected(False)
             self.selected = item
+            self.main_window.item_properties.item_selected(item)
             if item is not None:
                 item.set_selected(True)
 
     def select_port(self, port: Port):
-        if self.mode == Editor.Mode.ArcSource:
+        if self.mode == Mode.ArcSource:
             self.arc_mode_tmp = ArcModeTemporary(port, self)
-            self.mode = Editor.Mode.ArcTarget
-        elif self.mode == Editor.Mode.ArcTarget:
+            self.mode = Mode.ArcTarget
+        elif self.mode == Mode.ArcTarget:
             if self.arc_mode_tmp.connect_target(port):
                 self.arc_mode_tmp = None
                 self.mode = self.mode.ArcSource  # can make new arcs until A is pressed
 
     def mousePressEvent(self, event: QMouseEvent):
-        if self.mode == Editor.Mode.Normal:
+        if self.mode == Mode.Normal:
             super().mousePressEvent(event)
             print('editor mousePressEvent: event.isAccepted():', event.isAccepted())
 
             if not event.isAccepted() and event.button() == Qt.LeftButton:
                 self.select(None)
-        elif self.mode == Editor.Mode.ArcSource:
+        elif self.mode == Mode.ArcSource:
             super().mousePressEvent(event)
-        elif self.mode == Editor.Mode.ArcTarget:
+        elif self.mode == Mode.ArcTarget:
             super().mousePressEvent(event)
+
+    def cancel_arc_modes(self):
+        for item in chain(self.place_items, self.transition_items):
+            item.hide_ports()
+        if self.arc_mode_tmp is not None:
+            self.arc_mode_tmp.cancel()
+            self.arc_mode_tmp = None
 
     def keyPressEvent(self, key_event: QKeyEvent):
         if key_event.isAutoRepeat():
             return  # no autorepeats!
 
-        def cancel_arc_modes():
-            for item in chain(self.place_items, self.transition_items):
-                item.hide_ports()
-            if self.arc_mode_tmp is not None:
-                self.arc_mode_tmp.cancel()
-                self.arc_mode_tmp = None
-
         if key_event.key() == Qt.Key_Escape:
             self.select(None)
-            if self.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
-                cancel_arc_modes()
-                self.mode = Editor.Mode.Normal
+            if self.mode in (Mode.ArcSource, Mode.ArcTarget):
+                self.mode = Mode.Normal
 
         if key_event.key() == Qt.Key_Delete:
-            if self.mode == Editor.Mode.Normal:
+            if self.mode == Mode.Normal:
                 if isinstance(self.selected, PlaceItem):
                     self.delete_place_item(self.selected)
                 elif isinstance(self.selected, TransitionItem):
@@ -183,23 +170,22 @@ class Editor(QGraphicsView):
                     self.delete_arc_item(self.selected)
 
         if key_event.key() == Qt.Key_P:
-            if self.mode == Editor.Mode.Normal:
+            if self.mode == Mode.Normal:
                 place_item = self.add_place()
                 self.select(place_item)
 
         if key_event.key() == Qt.Key_T:
-            if self.mode == Editor.Mode.Normal:
+            if self.mode == Mode.Normal:
                 transition_item = self.add_transition()
                 self.select(transition_item)
 
         if key_event.key() == Qt.Key_A:
-            if self.mode == Editor.Mode.Normal:
+            if self.mode == Mode.Normal:
                 for item in chain(self.place_items, self.transition_items):
                     item.show_ports()
-                self.mode = Editor.Mode.ArcSource
-            elif self.mode in (Editor.Mode.ArcSource, Editor.Mode.ArcTarget):
-                cancel_arc_modes()
-                self.mode = Editor.Mode.Normal
+                self.mode = Mode.ArcSource
+            elif self.mode in (Mode.ArcSource, Mode.ArcTarget):
+                self.mode = Mode.Normal
 
     def keyReleaseEvent(self, key_event: QKeyEvent):
         if key_event.isAutoRepeat():
@@ -207,11 +193,11 @@ class Editor(QGraphicsView):
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         self.last_mouse_scene_pos = self.mapToScene(event.pos())
-        if self.mode == Editor.Mode.Normal:
+        if self.mode == Mode.Normal:
             super().mouseMoveEvent(event)
-        elif self.mode == Editor.Mode.ArcSource:
+        elif self.mode == Mode.ArcSource:
             pass
-        elif self.mode == Editor.Mode.ArcTarget:
+        elif self.mode == Mode.ArcTarget:
             pass
 
     def save_petrinet(self, file):
