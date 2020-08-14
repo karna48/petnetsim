@@ -21,6 +21,8 @@ class MainWindow(QMainWindow):
 
         self.filename = None
 
+        self.open()  # TODO remove
+
     @property
     def mode(self):
         return self.mode_switch.mode

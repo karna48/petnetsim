@@ -95,7 +95,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="simulation_pushButton">
          <property name="text">
           <string>Simulation</string>
          </property>
@@ -221,9 +221,16 @@
        </layout>
       </widget>
       <widget class="QWidget" name="place_props_page">
-       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0">
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="place_name_lineEdit"/>
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0,0,0">
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="place_init_tokens_spinBox"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Capacity</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_2">
@@ -232,20 +239,53 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="place_init_tokens_spinBox"/>
+        <item row="5" column="1">
+         <widget class="QLabel" name="place_current_tokens_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>place.current_tokens</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="2">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Current tokens</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="place_capacity_spinBox">
+          <property name="maximum">
+           <number>1000000000</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="place_name_lineEdit"/>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Current tokens</string>
           </property>
          </widget>
         </item>
@@ -266,42 +306,9 @@
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QLabel" name="place_current_tokens_label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QLabel" name="place_infinite_capacity_label">
           <property name="text">
-           <string>place.current_tokens</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="2">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Capacity</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="place_capacity_spinBox">
-          <property name="maximum">
-           <number>1000000000</number>
+           <string>(infinite capacity = )</string>
           </property>
          </widget>
         </item>
@@ -358,22 +365,22 @@
          <widget class="QComboBox" name="transition_type_comboBox">
           <item>
            <property name="text">
-            <string>Normal</string>
+            <string>Transition</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Priority</string>
+            <string>TransitionPriority</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Stochastic</string>
+            <string>TransitionStochastic</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Timed</string>
+            <string>TransitionTimed</string>
            </property>
           </item>
          </widget>
@@ -550,6 +557,10 @@ steps...
    <extends>QStackedWidget</extends>
    <header>editor.widgets.h</header>
    <container>1</container>
+   <slots>
+    <slot>place_name_changed(QString)</slot>
+    <slot>transition_name_changed(QString)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -571,7 +582,7 @@ steps...
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>simulation_pushButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
    <slot>simulation_editor_switched(bool)</slot>
@@ -583,6 +594,38 @@ steps...
     <hint type="destinationlabel">
      <x>733</x>
      <y>-7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transition_name_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>item_properties</receiver>
+   <slot>transition_name_changed(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>981</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1021</x>
+     <y>56</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>place_name_lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>item_properties</receiver>
+   <slot>place_name_changed(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>977</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>993</x>
+     <y>55</y>
     </hint>
    </hints>
   </connection>
