@@ -52,8 +52,13 @@ class ItemProperties(QStackedWidget):
 
 
 def find_main_window(widget: QWidget):
-    while (p := widget.parent()) is not None:
+#    while (p := widget.parent()) is not None:
+#        widget = p
+#    return widget
+    p = widget.parent()
+    while p is not None:
         widget = p
+        p = widget.parent()
     return widget
 
 

@@ -40,8 +40,12 @@ class MainWindow(QMainWindow):
 
     def open(self):
         self.filename = 'test.pnet.json'
-        with open(self.filename, 'r') as f:
-            self.editor.load_petrinet(f)
+        try:
+            with open(self.filename, 'r') as f:
+                self.editor.load_petrinet(f)
+        except FileNotFoundError:
+            print('waring: file not found')
+
 
     def save_as(self):
         self.editor: editor.Editor
