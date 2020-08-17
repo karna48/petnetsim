@@ -15,6 +15,7 @@ class ItemProperties(QStackedWidget):
 
     def edits_enabled(self, enabled):
         edit_types = (QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox)
+        widget: QWidget
         for widget in self.findChildren(edit_types):
             widget.setEnabled(enabled)
 
@@ -52,8 +53,11 @@ class ItemProperties(QStackedWidget):
 
 
 def find_main_window(widget: QWidget):
-    while (p := widget.parent()) is not None:
+    #while (p := widget.parent()) is not None:
+    p = widget.parent()
+    while p is not None:
         widget = p
+        p = widget.parent()
     return widget
 
 

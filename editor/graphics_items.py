@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, Inhibitor
+from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, \
+    Inhibitor
 from typing import Union, List, Any
 from math import sin, cos, atan2, pi
 import numpy as np
@@ -36,8 +37,8 @@ class PlaceItem(QGraphicsItemGroup):
 
         r = PlaceItem.CircleRadius
 
-        self.circle_select = QGraphicsEllipseItem(-r-4, -r-4, 2*r+8.5, 2*r+8.5)
-        self.circle = QGraphicsEllipseItem(-r, -r, 2*r, 2*r)
+        self.circle_select = QGraphicsEllipseItem(-r - 4, -r - 4, 2 * r + 8.5, 2 * r + 8.5)
+        self.circle = QGraphicsEllipseItem(-r, -r, 2 * r, 2 * r)
         self.tokens_text = QGraphicsSimpleTextItem('')
         self.capacity_text = QGraphicsSimpleTextItem('')
         self.name_text = QGraphicsSimpleTextItem('')
@@ -50,9 +51,9 @@ class PlaceItem(QGraphicsItemGroup):
         self.update_texts()
 
         n_ports = 8
-        self.ports = [Port(QPointF(r*cos(alpha), r*sin(alpha)),
+        self.ports = [Port(QPointF(r * cos(alpha), r * sin(alpha)),
                            self.place, self, editor, i)
-                      for i, alpha in enumerate(np.linspace(0, 2*pi*(n_ports-1)/n_ports, n_ports))]
+                      for i, alpha in enumerate(np.linspace(0, 2 * pi * (n_ports - 1) / n_ports, n_ports))]
 
         self.addToGroup(self.circle)
         self.addToGroup(self.circle_select)
@@ -80,16 +81,16 @@ class PlaceItem(QGraphicsItemGroup):
 
     def update_texts(self):
         self.name_text.setText(self.place.name)
-        self.name_text.setPos(-6*len(self.place.name)/2, -40)
+        self.name_text.setPos(-6 * len(self.place.name) / 2, -40)
 
         s = str(self.place.init_tokens)
         self.tokens_text.setText(s)
-        self.tokens_text.setPos(-6*len(s)/2, -8)
+        self.tokens_text.setPos(-6 * len(s) / 2, -8)
         self.tokens_text.setVisible(self.place.init_tokens > 0)
 
-        s = 'C='+str(self.place.capacity)
+        s = 'C=' + str(self.place.capacity)
         self.capacity_text.setText(s)
-        self.capacity_text.setPos(-6*len(s)/2, 20)
+        self.capacity_text.setPos(-6 * len(s) / 2, 20)
         self.capacity_text.setVisible(self.place.capacity != Place.INF_CAPACITY)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
@@ -119,7 +120,7 @@ class TransitionItem(QGraphicsItemGroup):
 
         w, h = TransitionItem.RectWidth, TransitionItem.RectHeight
 
-        self.rect = QGraphicsRectItem(-w/2, -h/2, w, h)
+        self.rect = QGraphicsRectItem(-w / 2, -h / 2, w, h)
         self.name_text = QGraphicsSimpleTextItem('name')
         self.attribute_text = QGraphicsSimpleTextItem('attribute')
         self.is_selected = False
@@ -132,13 +133,12 @@ class TransitionItem(QGraphicsItemGroup):
         self.addToGroup(self.name_text)
         self.addToGroup(self.attribute_text)
 
-        self.ports = [Port(QPointF(x, y),
-                           self.transition, self, editor, i)
-                      for i, (x, y) in
-                        enumerate(
-                            ((-w/2, 0), (w/2, 0),
-                             (-w/2, +h/3), (w/2, +h/3),
-                             (-w/2, -h/3), (w/2, -h/3)))]
+        port_centers = [QPointF(x, y) for x, y in
+                        ((-w / 2, 0), (w / 2, 0),
+                        (-w / 2, +h / 3), (w / 2, +h / 3),
+                        (-w / 2, -h / 3), (w / 2, -h / 3))]
+        t = self.transition
+        self.ports = [Port(pc, t, self, editor, i) for i, pc in enumerate(port_centers)]
 
         for p in self.ports:
             self.addToGroup(p)
@@ -161,10 +161,10 @@ class TransitionItem(QGraphicsItemGroup):
     def update_texts(self):
         w, h = TransitionItem.RectWidth, TransitionItem.RectHeight
         self.name_text.setText(self.transition.name)
-        self.name_text.setPos(-6*len(self.transition.name)/2, -h/2-30)
+        self.name_text.setPos(-6 * len(self.transition.name) / 2, -h / 2 - 30)
         s = 'U(1~3.2)s'
         self.attribute_text.setText(s)
-        self.attribute_text.setPos(-6*len(s)/2, h/2+5)
+        self.attribute_text.setPos(-6 * len(s) / 2, h / 2 + 5)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         selectable_with_ports_mousePressEvent(self, event)
@@ -186,7 +186,7 @@ class ArcItem(QGraphicsItemGroup):
                  editor):
         super().__init__()
         self.editor = editor
-        #self.setFlag(QGraphicsItem.ItemIsMovable)
+        # self.setFlag(QGraphicsItem.ItemIsMovable)
 
         self.source = source
         self.target = target
@@ -234,7 +234,7 @@ class ArcItem(QGraphicsItemGroup):
         self.line.setLine(line)
         center: QPointF = line.center()
         s = str(self.arc.n_tokens)
-        self.n_tokens_text.setPos(center.x()-6*len(s)/2, center.y()-20)
+        self.n_tokens_text.setPos(center.x() - 6 * len(s) / 2, center.y() - 20)
         self.end_shape.setRotation(-line.angle())
         self.end_shape.setPos(p2.x(), p2.y())
 
@@ -246,27 +246,27 @@ class ArcItem(QGraphicsItemGroup):
         center: QPointF = self.line.line().center()
         s = str(self.arc.n_tokens)
         self.n_tokens_text.setText(s)
-        self.n_tokens_text.setPos(center.x()-6*len(s)/2, center.y()-20)
+        self.n_tokens_text.setPos(center.x() - 6 * len(s) / 2, center.y() - 20)
         self.n_tokens_text.setVisible(self.arc.n_tokens > 1)
 
     def shape(self) -> QPainterPath:
+        # TODO not the bounding box, please!
         pp = QPainterPath()
         rect = self.line.boundingRect()
         if rect.width() < 5:
             rem = 5 - rect.width()
-            rect.setX(rect.x()+rem/2)
-            rect.setWidth(rect.width()+rem)
+            rect.setX(rect.x() + rem / 2)
+            rect.setWidth(rect.width() + rem)
         if rect.height() < 5:
             rem = 5 - rect.height()
-            rect.setY(rect.y()+rem/2)
-            rect.setHeight(rect.height()+rem)
+            rect.setY(rect.y() + rem / 2)
+            rect.setHeight(rect.height() + rem)
         pp.addRect(rect)
         return pp
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
             self.editor.select(self)
-            print('ArcItem mouse pressed and accepted')
             event.accept()
 
 
@@ -279,7 +279,7 @@ def selectable_with_ports_mousePressEvent(item, event):
                     item.editor.select_port(port_item)
                     break
 
-        elif item.editor.main_window.mode == Mode.Normal:
+        elif item.editor.main_window.mode in (Mode.Normal, Mode.Simulation):
             if item.is_selected:
                 pass
             else:

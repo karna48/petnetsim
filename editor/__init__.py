@@ -113,7 +113,7 @@ class Editor(QGraphicsView):
         self.arc_items.remove(arc_item)
 
     def select(self, item):
-        if self.mode == Mode.Normal:
+        if self.mode in (Mode.Normal, Mode.Simulation):
             if self.selected == item:
                 return
             if self.selected is not None:
@@ -133,9 +133,8 @@ class Editor(QGraphicsView):
                 self.mode = self.mode.ArcSource  # can make new arcs until A is pressed
 
     def mousePressEvent(self, event: QMouseEvent):
-        if self.mode == Mode.Normal:
+        if self.mode in (Mode.Normal, Mode.Simulation):
             super().mousePressEvent(event)
-            print('editor mousePressEvent: event.isAccepted():', event.isAccepted())
 
             if not event.isAccepted() and event.button() == Qt.LeftButton:
                 self.select(None)
