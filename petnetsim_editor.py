@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
 
         uic.loadUi('editor/petnetsim.ui', self)
 
+        self.item_properties.after_init()
         self.item_properties.item_selected(None)
 
         self.actionSave.triggered.connect(self.save)

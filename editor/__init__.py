@@ -12,7 +12,6 @@ from collections import defaultdict
 from .graphics_items import PlaceItem, TransitionItem, ArcItem, Port
 import enum
 from .mode import Mode
-from .widgets import find_main_window
 
 
 class Editor(QGraphicsView):
@@ -21,7 +20,7 @@ class Editor(QGraphicsView):
         self.setScene(QGraphicsScene())
         self.setMouseTracking(True)
 
-        self.main_window = find_main_window(self)
+        self.main_window = self.window()
 
         self.arc_lookup = defaultdict(list)
         self.arc_mode_tmp = None
@@ -112,6 +111,21 @@ class Editor(QGraphicsView):
         self.scene().removeItem(arc_item)
         self.arc_items.remove(arc_item)
 
+    def substitute_object(self, old_obj, new_obj):
+        for arc_item in self.arc_items:
+            added = False
+
+            if arc_item.arc.source == old_obj:
+                added = True
+                arc_item.arc.source = new_obj
+            if arc_item.arc.target == old_obj:
+                added = True
+                arc_item.arc.target = new_obj
+
+            if added:
+                self.arc_lookup[new_obj].append(arc_item)
+        self.arc_lookup.pop(old_obj)
+
     def select(self, item):
         if self.mode == Mode.Normal:
             if self.selected == item:
@@ -135,7 +149,6 @@ class Editor(QGraphicsView):
     def mousePressEvent(self, event: QMouseEvent):
         if self.mode == Mode.Normal:
             super().mousePressEvent(event)
-            print('editor mousePressEvent: event.isAccepted():', event.isAccepted())
 
             if not event.isAccepted() and event.button() == Qt.LeftButton:
                 self.select(None)

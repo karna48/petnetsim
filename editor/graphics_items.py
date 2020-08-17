@@ -175,6 +175,28 @@ class TransitionItem(QGraphicsItemGroup):
 
         return super().itemChange(change, value)
 
+    def set_timed_pdist(self, func):
+        if type(self.transition) == TransitionTimed:
+            self.transition.p_distribution_func = func
+        else:
+            QMessageBox.critical(None, 'error', 'TransitionItem.set_timed_pdist requires transition to be TransitionTimed')
+
+    def change_transition_type(self, cls: Union[Transition, TransitionTimed, TransitionPriority, TransitionStochastic]):
+        old_t = self.transition
+        if cls == Transition:
+            new_t = Transition(old_t.name)
+        elif cls == TransitionTimed:
+            new_t = TransitionTimed(old_t.name, 1)
+        elif cls == TransitionPriority:
+            new_t = TransitionPriority(old_t.name, 1)
+        elif cls == TransitionStochastic:
+            new_t = TransitionStochastic(old_t.name, 0.5)
+        else:
+            raise RuntimeError('change_transition_type: wrong class:', str(cls))
+
+        self.editor.substitute_object(old_t, new_t)
+        self.transition = new_t
+
 
 class ArcItem(QGraphicsItemGroup):
     NormalPen = QPen(QColor('black'), 1)
@@ -266,7 +288,6 @@ class ArcItem(QGraphicsItemGroup):
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         if event.button() == Qt.LeftButton:
             self.editor.select(self)
-            print('ArcItem mouse pressed and accepted')
             event.accept()
 
 
