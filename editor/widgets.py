@@ -9,6 +9,9 @@ from petnetsim.elements import \
 
 
 class ItemProperties(QStackedWidget):
+    TimedPDists = [('constant t = t_min', constant_distribution),
+                   ('uniform [t_min; t_max]', uniform_distribution)]
+
     def __init__(self, parent):
         super().__init__(parent)
         self.main_window = self.window()
