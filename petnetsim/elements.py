@@ -65,11 +65,6 @@ class Transition:
         self.inhibitors = []  # init in reset
 
     def enabled(self):
-        # if len(self.inhibitors):
-        #     print(self.name, 'inhibitors (name, state):',
-        #           [(inhibitor.name, inhibitor.source.can_remove(inhibitor.n_tokens))
-        #            for inhibitor in self.inhibitors])
-
         return all(arc.source.can_remove(arc.n_tokens) for arc in self.in_arcs) \
                and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs) \
                and not any(inhibitor.source.can_remove(inhibitor.n_tokens) for inhibitor in self.inhibitors)
