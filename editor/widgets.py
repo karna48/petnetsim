@@ -110,3 +110,12 @@ class ItemProperties(QStackedWidget):
             editor = self.main_window.editor
             editor.selected.arc.name = name
 
+    def arc_n_tokens_changed(self, value: int):
+        if not self.is_filling_forms:
+            editor = self.main_window.editor
+            editor.selected.arc.n_tokens = value
+            editor.selected.update_texts()
+
+    def arc_inhibitor_checkbox_toggled(self, toggled: bool):
+        if not self.is_filling_forms:
+            print('TODO: arc/inhibitor switch')
