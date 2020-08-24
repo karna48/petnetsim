@@ -6,12 +6,15 @@ from petnetsim import PetriNet
 from petnetsim.elements import Place, Transition, \
     TransitionPriority, TransitionTimed, TransitionStochastic, \
     Arc, Inhibitor
-from typing import Union
+from typing import Union, List, Dict
 from itertools import chain
 from collections import defaultdict
 from .graphics_items import PlaceItem, TransitionItem, ArcItem, Port
 import enum
 from .mode import Mode
+
+PlaceTransitionUnion = Union[Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic]
+TransitionUnion = Union[Transition, TransitionPriority, TransitionTimed, TransitionStochastic]
 
 
 class Editor(QGraphicsView):
@@ -27,17 +30,24 @@ class Editor(QGraphicsView):
 
         self.selected: Union[None, PlaceItem, TransitionItem, ArcItem] = None
 
-        self.place_items = []
-        self.transition_items = []
-        self.arc_items = []
+        self.place_items: List[PlaceItem] = []
+        self.transition_items: List[TransitionItem] = []
+        self.arc_items: List[ArcItem] = []
 
         self.last_mouse_scene_pos = QPointF()
 
-    def verified_petrinet(self, toggled=None, inform_success=True) -> Union[PetriNet, None]:
+    def verified_petrinet(self, toggled=None, inform_success=True, include_item_lookups=False) -> Union[PetriNet, None]:
         try:
             pn = PetriNet([item.place for item in self.place_items],
                           [item.transition for item in self.transition_items],
                           [item.arc for item in self.arc_items])
+
+            if include_item_lookups:
+                pn.place_item_lookup = {item.place: item for item in self.place_items}
+                pn.transition_item_lookup = {item.transition: item for item in self.transition_items}
+                pn.arc_item_lookup = {item.arc: item for item in self.arc_items}
+
+
             msg = f'{len(pn.places)} places, {len(pn.transitions)} transitions, {len(pn.arcs)} arcs'
             if inform_success:
                 QMessageBox.information(None, 'verification success', msg)
@@ -48,6 +58,10 @@ class Editor(QGraphicsView):
             QMessageBox.warning(None, 'verification failed', msg)
             return None
 
+    def update_all_texts(self):
+        for item in chain(self.place_items, self.transition_items, self.arc_items):
+            item.update_texts()
+
     @property
     def mode(self):
         return self.main_window.mode
@@ -56,7 +70,7 @@ class Editor(QGraphicsView):
     def mode(self, new_mode):
         self.main_window.mode = new_mode
 
-    def item_moved(self, assoc_obj):
+    def item_moved(self, assoc_obj: PlaceTransitionUnion):
         arc_item: ArcItem
         for arc_item in self.arc_lookup[assoc_obj]:
             arc_item.update_ports()
@@ -105,7 +119,7 @@ class Editor(QGraphicsView):
         self.arc_lookup[target_port.assoc_obj].append(arc_item)
         return arc_item
 
-    def delete_arc_item(self, arc_item):
+    def delete_arc_item(self, arc_item: ArcItem):
         self.arc_lookup[arc_item.source.assoc_obj].remove(arc_item)
         self.arc_lookup[arc_item.target.assoc_obj].remove(arc_item)
         self.scene().removeItem(arc_item)
@@ -301,6 +315,5 @@ class ArcModeTemporary:
         return True
 
     def cancel(self):
-        print('ArcModeTemporary cancel')
         self.source_port.setBrush(Port.NormalBrush)
         self.source_port = None

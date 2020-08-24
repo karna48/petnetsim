@@ -41,7 +41,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0,0,0,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0,0,0,0,0,0">
        <property name="spacing">
         <number>3</number>
        </property>
@@ -115,55 +115,22 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="sim_wait_label">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <widget class="QDoubleSpinBox" name="simulation_wait_doubleSpinBox">
+         <property name="prefix">
+          <string>step wait: </string>
          </property>
-         <property name="text">
-          <string>Wait:</string>
+         <property name="suffix">
+          <string> s</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="simulation_wait_comboBox">
-         <item>
-          <property name="text">
-           <string>0.00</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>0.25</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>0.50</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>0.75</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1.00</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>2.00</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>5.00</string>
-          </property>
-         </item>
+         <property name="maximum">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.250000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
         </widget>
        </item>
        <item>
@@ -358,8 +325,59 @@ steps...
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>simulation_run_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>simulation_run()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>720</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>685</x>
+     <y>-6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>simulation_step_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>simulation_step()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>911</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>923</x>
+     <y>-14</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>simulation_reset_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>simulation_step()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>978</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>963</x>
+     <y>-5</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>simulation_editor_switched(bool)</slot>
+  <slot>simulation_run()</slot>
+  <slot>simulation_step()</slot>
+  <slot>simulation_reset()</slot>
  </slots>
 </ui>

@@ -17,8 +17,11 @@ ModeStrings = {Mode.Normal: 'Editor: Normal',
 
 class ModeSwitch:
     def __init__(self, main_window):
+        from .simulationcontroller import SimulationController  # avoid circular dependency
+
         self._mode = Mode.Normal
         self.main_window = main_window
+        self.simulation_controller: SimulationController = main_window.simulation_controller
 
     @property
     def mode(self):
@@ -44,3 +47,11 @@ class ModeSwitch:
         if self.mode == Mode.Simulation:
             self.main_window.item_properties.edits_enabled(False)
             self.main_window.sim_buttons_enabled(True)
+            self.simulation_controller.init_petrinet()
+            self.simulation_controller.reset()
+            self.simulation_controller.animate_timer.start(0)
+
+        if self.mode != Mode.Simulation and old_mode == Mode.Simulation:
+            self.simulation_controller.reset()
+            self.simulation_controller.animate_timer.stop()
+            self.main_window.editor.update_all_texts()

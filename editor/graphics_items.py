@@ -93,6 +93,12 @@ class PlaceItem(QGraphicsItemGroup):
         self.capacity_text.setPos(-6 * len(s) / 2, 20)
         self.capacity_text.setVisible(self.place.capacity != Place.INF_CAPACITY)
 
+    def update_tokens_text_simulation(self):
+        s = str(self.place.tokens)
+        self.tokens_text.setText(s)
+        self.tokens_text.setPos(-6 * len(s) / 2, -8)
+        self.tokens_text.setVisible(self.place.tokens > 0)
+
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         selectable_with_ports_mousePressEvent(self, event)
 
@@ -108,6 +114,8 @@ class TransitionItem(QGraphicsItemGroup):
     RectHeight = 46
     NormalPen = QPen(QColor('black'), 1)
     SelectedPen = QPen(QColor('red'), 3)
+    NormalBrush = QBrush(QColor('gray'))
+    FiredBrush = QBrush(QColor('orange'))
 
     def __init__(self,
                  transition: Union[Transition, TransitionTimed, TransitionPriority, TransitionStochastic],
@@ -125,7 +133,7 @@ class TransitionItem(QGraphicsItemGroup):
         self.attribute_text = QGraphicsSimpleTextItem('attribute')
         self.is_selected = False
 
-        self.rect.setBrush(QColor('gray'))
+        self.rect.setBrush(TransitionItem.NormalBrush)
 
         self.update_texts()
 
@@ -146,6 +154,9 @@ class TransitionItem(QGraphicsItemGroup):
         self.hide_ports()
         self.set_selected(self.is_selected)
 
+    def set_brush(self, is_fired):
+        self.rect.setBrush(TransitionItem.FiredBrush if is_fired else TransitionItem.NormalBrush)
+
     def show_ports(self):
         for p in self.ports:
             p.setVisible(True)
@@ -162,7 +173,8 @@ class TransitionItem(QGraphicsItemGroup):
         w, h = TransitionItem.RectWidth, TransitionItem.RectHeight
         self.name_text.setText(self.transition.name)
         self.name_text.setPos(-6 * len(self.transition.name) / 2, -h / 2 - 30)
-        s = 'U(1~3.2)s'
+        # TODO: different types
+        s = ''
         self.attribute_text.setText(s)
         self.attribute_text.setPos(-6 * len(s) / 2, h / 2 + 5)
 
@@ -201,6 +213,8 @@ class TransitionItem(QGraphicsItemGroup):
 class ArcItem(QGraphicsItemGroup):
     NormalPen = QPen(QColor('black'), 1)
     SelectedPen = QPen(QColor('red'), 3)
+    FiredMarkerBrush = QBrush(QColor('orange'))
+    FiredMarkerRect = QRectF(-5, -5, 10, 10)
 
     def __init__(self,
                  arc: Union[Arc, Inhibitor],
@@ -229,6 +243,11 @@ class ArcItem(QGraphicsItemGroup):
         self.end_shape = QGraphicsPathItem(arrow_path)
         self.end_shape.setBrush(QColor('black'))
         self.n_tokens_text = QGraphicsSimpleTextItem('n_tokens')
+        self.fired_marker = QGraphicsEllipseItem(ArcItem.FiredMarkerRect)
+        self.fired_marker.setBrush(ArcItem.FiredMarkerBrush)
+
+        self.fired_marker_t = 0.0  # interpolation coefficient
+
         self.is_selected = False
 
         self.set_arc_or_inhibitor(arc)
@@ -237,6 +256,9 @@ class ArcItem(QGraphicsItemGroup):
         self.addToGroup(self.line)
         self.addToGroup(self.end_shape)
         self.addToGroup(self.n_tokens_text)
+        self.addToGroup(self.fired_marker)
+
+        self.fired_marker_set_visibility(False)
 
         self.update_ports()
 
@@ -259,6 +281,7 @@ class ArcItem(QGraphicsItemGroup):
         self.n_tokens_text.setPos(center.x() - 6 * len(s) / 2, center.y() - 20)
         self.end_shape.setRotation(-line.angle())
         self.end_shape.setPos(p2.x(), p2.y())
+        self.fired_marker_interpolate_position(self.fired_marker_t)
 
     def set_selected(self, b):
         self.is_selected = b
@@ -270,6 +293,13 @@ class ArcItem(QGraphicsItemGroup):
         self.n_tokens_text.setText(s)
         self.n_tokens_text.setPos(center.x() - 6 * len(s) / 2, center.y() - 20)
         self.n_tokens_text.setVisible(self.arc.n_tokens > 1)
+
+    def fired_marker_set_visibility(self, is_visible):
+        self.fired_marker.setVisible(is_visible)
+
+    def fired_marker_interpolate_position(self, t):
+        line: QLineF = self.line.line()
+        self.fired_marker.setPos(line.pointAt(t))
 
     def shape(self) -> QPainterPath:
         # TODO not the bounding box, please!

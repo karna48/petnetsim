@@ -3,13 +3,12 @@ from PyQt5.QtWidgets import *
 import sys
 import editor
 from editor.mode import ModeSwitch, Mode
+from editor.simulationcontroller import SimulationController
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.mode_switch = ModeSwitch(self)
-
         uic.loadUi('editor/petnetsim.ui', self)
 
         self.item_properties.after_init()
@@ -21,6 +20,9 @@ class MainWindow(QMainWindow):
         self.actionOpen.triggered.connect(self.open)
 
         self.filename = None
+
+        self.simulation_controller = SimulationController(self, self.editor)
+        self.mode_switch = ModeSwitch(self)
 
         self.open()  # TODO remove
 
@@ -46,7 +48,6 @@ class MainWindow(QMainWindow):
                 self.editor.load_petrinet(f)
         except FileNotFoundError:
             print('waring: file not found')
-
 
     def save_as(self):
         self.editor: editor.Editor
@@ -75,6 +76,16 @@ class MainWindow(QMainWindow):
                        self.simulation_reset_pushButton)
         for sb in sim_buttons:
             sb.setEnabled(enabled)
+
+    def simulation_run(self):
+        self.simulation_controller.run()
+
+    def simulation_step(self):
+        self.simulation_controller.auto_run_next_step = False
+        self.simulation_controller.step()
+
+    def simulation_reset(self):
+        self.simulation_controller.reset()
 
 
 def run():

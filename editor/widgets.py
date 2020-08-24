@@ -8,6 +8,11 @@ from petnetsim.elements import \
     TransitionPriority, TransitionTimed, Arc, \
     constant_distribution, uniform_distribution
 
+from collections import namedtuple, OrderedDict
+from operator import attrgetter
+
+TClassPage = namedtuple('TClassNamePage', ('cls', 'page'))
+
 
 class ItemProperties(QStackedWidget):
     TimedPDists = [('constant t = t_min', constant_distribution),
@@ -19,7 +24,17 @@ class ItemProperties(QStackedWidget):
         uic.loadUi('editor/item_properties.ui', self)
 
         self.main_window = self.window()
+
+        self.transition_types = \
+            OrderedDict((('Transition', TClassPage(Transition, self.transition_normal_page)),
+                         ('Timed transition', TClassPage(TransitionTimed, self.transition_timed_page)),
+                         ('Transition w/ priority', TClassPage(TransitionPriority, self.transition_priority_page)),
+                         ('Transition w/ probability', TClassPage(TransitionStochastic, self.transition_stochastic_page))))
+
+        self.is_filling_forms = True
+        self.transition_type_comboBox.addItems(self.transition_types.keys())
         self.is_filling_forms = False
+
 
     def after_init(self):
         self.is_filling_forms = True
@@ -41,30 +56,27 @@ class ItemProperties(QStackedWidget):
             self.is_filling_forms = True
             self.setCurrentWidget(self.place_props_page)
             self.place_name_lineEdit.setText(item.place.name)
-            self.place_init_tokens_spinBox.setValue(item.place.capacity)
+            self.place_init_tokens_spinBox.setValue(item.place.init_tokens)
             self.place_capacity_spinBox.setValue(item.place.capacity)
             self.place_infinite_capacity_label.setText(f'(infinite capacity = {Place.INF_CAPACITY})')
             self.is_filling_forms = False
 
         elif isinstance(item, TransitionItem):
             self.setCurrentWidget(self.transition_props_page)
-            transition_types_stackedWidget = self.transition_types_stackedWidget
+            name = list(self.transition_types.keys())[list(map(attrgetter('cls'), self.transition_types.values())).index(type(item.transition))]
+            ttype_info = self.transition_types[name]
+            self.transition_types_stackedWidget.setCurrentWidget(ttype_info.page)
             self.is_filling_forms = True
             self.transition_name_lineEdit.setText(item.transition.name)
-
-            # TODO: create lookup for classes and displayed names (decouple from gui inside .ui file)
-            self.transition_type_comboBox.setCurrentText(item.transition.__class__.__name__)
+            self.transition_type_comboBox.setCurrentText(name)
             if type(item.transition) == Transition:
-                transition_types_stackedWidget.setCurrentWidget(self.transition_normal_page)
+                pass
             elif type(item.transition) == TransitionPriority:
-                transition_types_stackedWidget.setCurrentWidget(self.transition_priority_page)
                 self.transition_priority_spinBox.setValue(item.transition.priority)
             elif type(item.transition) == TransitionTimed:
-                transition_types_stackedWidget.setCurrentWidget(self.transition_timed_page)
                 self.transition_t_min_doubleSpinBox.setValue(item.transition.t_min)
                 self.transition_t_max_doubleSpinBox.setValue(item.transition.t_max)
             elif type(item.transition) == TransitionStochastic:
-                transition_types_stackedWidget.setCurrentWidget(self.transition_stochastic_page)
                 self.transition_probability_percent_spinBox.setValue(item.transition.probability*100)
             self.is_filling_forms = False
         elif isinstance(item, ArcItem):
@@ -99,18 +111,11 @@ class ItemProperties(QStackedWidget):
             editor.selected.transition.name = name
             editor.selected.update_texts()
 
-    def transition_type_changed(self, class_name):
+    def transition_type_changed(self, name):
+        # name is from transition_type_comboBox
         if not self.is_filling_forms:
-            classes = [Transition, TransitionTimed, TransitionStochastic, TransitionPriority]
-            try:
-                idx = [c.__name__ for c in classes].index(class_name)
-                cls = classes[idx]
-            except ValueError:
-                QMessageBox.critical('wrong class name of transition:'+class_name)
-                return
-
             editor = self.main_window.editor
-            editor.selected.change_transition_type(cls)
+            editor.selected.change_transition_type(self.transition_types[name].cls)
             self.item_selected(editor.selected)
 
     def transition_priority_changed(self, value: int):
