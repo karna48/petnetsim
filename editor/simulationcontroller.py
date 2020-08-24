@@ -86,13 +86,15 @@ class SimulationController:
 
     def animate(self):
         if not self.animate_waiting:
-            can_auto_next_step = self.auto_run_next_step
             if self.step_animation_duration > 0:
                 t2 = time()
                 dt = t2-self.t1
                 tpol = min(dt, self.step_animation_duration) / self.step_animation_duration  # interpolation coefficient
                 for arc in self.step_fired_arcs:
                     self.petrinet.arc_item_lookup[arc].fired_marker_interpolate_position(tpol)
-                can_auto_next_step = dt >= self.step_animation_duration  # deny auto next step
+                can_auto_next_step = self.auto_run_next_step and dt >= self.step_animation_duration  # deny auto next step
+            else:
+                can_auto_next_step = self.auto_run_next_step
+
             if can_auto_next_step:
                 self.step()
