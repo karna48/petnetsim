@@ -1,4 +1,4 @@
-# doc/drawing/sample_004_stochastic.svg
+# doc/drawing/sample_005_priority.svg
 
 from itertools import count, combinations
 from petnetsim import *

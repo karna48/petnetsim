@@ -1,4 +1,4 @@
-# doc/drawing/sample_008_deadlock_priority.svg
+# doc/drawing/sample_009_deadlock_P1watchdog.svg
 
 # TODO timed transitions not working correctly with normal transitions
 

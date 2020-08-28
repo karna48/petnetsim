@@ -1,4 +1,4 @@
-# doc/drawing/sample_008_deadlock_priority.svg
+# doc/drawing/sample_010_capacity_limit_shared.svg
 
 from itertools import count, combinations
 from petnetsim import *
