@@ -27,7 +27,7 @@ class Place:
 
     def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY, context=_default_context):
         if name is None:
-            self.name = '_P_'+str(context['counters']['P'])
+            self.name = 'P_'+str(context['counters']['P'])
             context['counters']['P'] += 1
         else:
             self.name = name
@@ -54,7 +54,7 @@ class Place:
 class Transition:
     def __init__(self, name, context=_default_context):
         if name is None:
-            self.name = '_T_'+str(context['counters']['T'])
+            self.name = 'T_'+str(context['counters']['T'])
             context['counters']['T'] += 1
         else:
             self.name = name
@@ -143,7 +143,7 @@ class TransitionStochastic(Transition):
 class Arc:
     def __init__(self, source, target, n_tokens=1, name=None, context=_default_context):
         if name is None:
-            self.name = '_Arc_'+str(context['counters']['A'])
+            self.name = 'Arc_'+str(context['counters']['A'])
             context['counters']['A'] += 1
         else:
             self.name = name
@@ -179,7 +179,7 @@ class Arc:
 class Inhibitor:
     def __init__(self, source, target, n_tokens=1, name=None, context=_default_context):
         if name is None:
-            self.name = '_Inhibitor_'+str(context['counters']['I'])
+            self.name = 'Inhibitor_'+str(context['counters']['I'])
             context['counters']['I'] += 1
         else:
             self.name = name

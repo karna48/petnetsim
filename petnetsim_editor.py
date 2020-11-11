@@ -24,8 +24,6 @@ class MainWindow(QMainWindow):
         self.simulation_controller = SimulationController(self, self.editor)
         self.mode_switch = ModeSwitch(self)
 
-        self.open()  # TODO remove
-
     @property
     def mode(self):
         return self.mode_switch.mode
@@ -34,33 +32,51 @@ class MainWindow(QMainWindow):
     def mode(self, new_mode):
         self.mode_switch.mode = new_mode
 
-    def choose_filename(self):
-        self.filename = 'test.pnet.json'
+    def choose_filename_save(self):
+        filename, _ = QFileDialog.getSaveFileName(
+            parent=self,
+            caption='Select file containing petrinet in JSON',
+            directory=self.filename if self.filename is not None else '.json',
+            filter='PetriNet in JSON (*.json);;All files (*.*)')
+        if len(filename):
+            self.filename = filename
+        else:
+            self.filename = None
 
     def new(self):
         self.editor: editor.Editor
         self.editor.clear()
+        self.filename = None
 
     def open(self):
-        self.filename = 'test.pnet.json'
-        try:
-            with open(self.filename, 'r') as f:
-                self.editor.load_petrinet(f)
-        except FileNotFoundError:
-            print('waring: file not found')
+        filename, _ = QFileDialog.getOpenFileName(
+            parent=self,
+            caption='Select file containing petrinet in JSON',
+            directory='.',
+            filter='PetriNet in JSON (*.json);;All files (*.*)')
+
+        if len(filename) > 0:
+            self.filename = filename
+            try:
+                with open(self.filename, 'r') as f:
+                    self.editor.load_petrinet(f)
+            except FileNotFoundError:
+                print('waring: file not found')
 
     def save_as(self):
         self.editor: editor.Editor
         if self.editor.verified_petrinet(inform_success=False) is not None:
-            self.choose_filename()
-            self.save_petrinet()
+            self.choose_filename_save()
+            if self.filename is not None:
+                self.save_petrinet()
 
     def save(self):
         self.editor: editor.Editor
         if self.editor.verified_petrinet(inform_success=False) is not None:
             if self.filename is None:
-                self.choose_filename()
-            self.save_petrinet()
+                self.choose_filename_save()
+            if self.filename is not None:
+                self.save_petrinet()
 
     def save_petrinet(self):
         self.editor: editor.Editor
