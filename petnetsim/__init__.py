@@ -111,7 +111,7 @@ class PetriNet:
                         probabilities = self.conflict_group_data[cgi][t_idxs]
                         # "normalize" the sum of probabilities to 1
                         probabilities_norm = probabilities * (1 / np.sum(probabilities))
-                        t_fire_idx = np.random.choice(t_idxs, p=probabilities_norm[t_idxs])
+                        t_fire_idx = np.random.choice(t_idxs, p=probabilities_norm)
                     elif cg_type == CGT.Timed:
                         # conflict_group_data[cgi][0, ti] = isinstance(t, TransitionTimed)
                         # conflict_group_data[cgi][1, ti] = not isinstance(t, TransitionTimed)

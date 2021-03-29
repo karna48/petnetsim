@@ -262,26 +262,42 @@ class Editor(QGraphicsView):
         places, transitions, arcs, graphics = json_io.load(file)
         obj_item_lookup = {}
         names_lookup = {}
+        obj_i = 0
         for p in places:
             names_lookup[p.name] = p
             item = self.add_place(p)
             obj_item_lookup[p] = item
-            g = graphics[p]
+            if graphics is not None:
+                g = graphics[p]
+            else:
+                g = list(n*60 for n in divmod(obj_i, 10))
+                g.reverse()
             item.setPos(g[0], g[1])
+            obj_i += 1
+
         for t in transitions:
             names_lookup[t.name] = t
             item = self.add_transition(t)
-            g = graphics[t]
             obj_item_lookup[t] = item
+            if graphics is not None:
+                g = graphics[t]
+            else:
+                g = list(n * 60 for n in divmod(obj_i, 10))
+                g.reverse()
             item.setPos(g[0], g[1])
+            obj_i += 1
 
         for a in arcs:
             a.connect(names_lookup)
             source_item = obj_item_lookup[a.source]
             target_item = obj_item_lookup[a.target]
-            g = graphics[a]
+            if graphics is not None:
+                g = graphics[a]
+            else:
+                g = (0, 0)  # default ports
             source_port = source_item.ports[g[0]]
             target_port = target_item.ports[g[1]]
+
             item = self.add_arc(source_port, target_port, arc=a)
 
 

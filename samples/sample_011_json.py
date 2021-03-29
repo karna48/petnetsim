@@ -44,9 +44,16 @@ petri_net = \
          (unnamed_place_4, unnamed_transition_7), (unnamed_transition_7, 'I')),
         context=ctx)
 
+petri_net.reset()
+petri_net.step()
+petri_net.step()
+petri_net.step()
+
 petri_net_dump = dumps(petri_net.places, petri_net.transitions, petri_net.arcs)
 print(petri_net_dump)
 print('-----------------------------------------------')
+with open('sample_011_dump.json', 'w') as fout:
+    fout.write(petri_net_dump)
 
 data = json.loads(petri_net_dump)
 data['places'] = {int(k): v for k, v in data['places'].items()}
@@ -63,6 +70,12 @@ petri_net_from_dump = PetriNet(p2_places, p2_transitions, p2_arcs)
 
 print('petri_net_from_dump')
 petri_net_from_dump.print_all()
+
+
+petri_net_from_dump.reset()
+petri_net_from_dump.step()
+petri_net_from_dump.step()
+petri_net_from_dump.step()
 
 
 def compare_petri_nets(pn1, pn2):
