@@ -120,13 +120,16 @@ class TransitionTimed(Transition):
         return super().enabled() and not self.is_waiting
 
     def fire(self):
-        super().fire()
-        self.is_waiting = False
-
-    def wait(self):
+        for arc in self.in_arcs:
+            arc.source.remove(arc.n_tokens)
         self.is_waiting = True
         self.time = self.p_distribution_func(self.t_min, self.t_max)
-        return self.time
+
+    def fire_phase2(self):
+        for arc in self.outputs:
+            arc.target.add(arc.n_tokens)
+        self.is_waiting = False
+        self.fired_times += 1
 
     def reset(self):
         super().reset()

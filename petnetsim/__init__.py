@@ -258,7 +258,8 @@ class PetriNet:
 
                 conflict_group_data[cg_i] = np.zeros(len(self.transitions))
             else:
-                raise RuntimeError('Unsupported combination of transitions: ' + ', '.join([str(tt) for tt in t_types]))
+                raise RuntimeError('Unsupported combination of transitions: ' + ', '.join([str(tt) for tt in t_types]) + \
+                                   '\n' + '; '.join(c.__class__.__name__+': '+c.name for c in cg))
 
             conflict_groups_types[cg_i] = cg_type
 
