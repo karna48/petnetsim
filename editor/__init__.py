@@ -317,12 +317,10 @@ class ArcModeTemporary:
             return False
 
         for arc_item in self.editor.arc_items:
-            # no duplicities and backward arcs!
+            # no duplicities
             same_source = arc_item.source.assoc_obj == self.source_port.assoc_obj
             same_target = arc_item.target.assoc_obj == target_port.assoc_obj
-            reversed_st = arc_item.source.assoc_obj == target_port.assoc_obj
-            reversed_ts = arc_item.target.assoc_obj == self.source_port.assoc_obj
-            if (same_source and same_target) or (reversed_st and reversed_ts):
+            if (same_source and same_target):
                 print('ERROR: already connected')
                 return False
 
