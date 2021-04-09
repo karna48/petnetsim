@@ -3,7 +3,7 @@ from enum import IntEnum
 import numpy as np
 from operator import attrgetter
 from .elements import *
-
+import sys
 
 # from .xml_loader import load_xml
 
@@ -99,6 +99,7 @@ class PetriNet:
                 if ecg.any():
                     cg_type = self.conflict_groups_types[cgi]
                     t_idxs = np.argwhere(ecg).flatten()  # absolute indices of enabled transitions in group
+                    t_fire_idx = None
                     if cg_type == CGT.Normal:
                         t_fire_idx = np.random.choice(t_idxs)
                     elif cg_type == CGT.Priority:
@@ -124,21 +125,23 @@ class PetriNet:
                             else:  # then must be timed
                                 timed_enabled = self.enabled_tmp
                                 np.bitwise_and(ecg, self.conflict_group_data[cgi][0], out=timed_enabled)
-                                t_fire_idx = None
                                 timed_t_idxs = np.argwhere(timed_enabled).flatten()
                                 timed_t_idx = np.random.choice(timed_t_idxs)
-                                timed_t = self.transitions[timed_t_idx]
-                                self.conflict_groups_waiting[cgi] = timed_t.wait()
-                                # print(' ', timed_t.name, 'wait =', self.conflict_groups_waiting[cgi])
-                        else:
-                            t_fire_idx = None
+                                t_fire_idx = timed_t_idx
+                                timed_t: TransitionTimed = self.transitions[timed_t_idx]
+                                self.conflict_groups_waiting[cgi] = timed_t.choose_time()
+                                print(' ', timed_t.name, 'wait =', self.conflict_groups_waiting[cgi])
 
                     if t_fire_idx is not None:
                         t = self.transitions[t_fire_idx]
-                        t.fire()
-                        num_fired += 1
-                        if record_fired:
-                            self.fired.append(t)
+                        if t.output_possible():
+                            t.fire()
+                            num_fired += 1
+                            if record_fired:
+                                self.fired.append(t)
+                        else:
+                            print(f'warning: transition "{t.name}" was enabled, but output not possible', file=sys.stderr)
+
 
         num_waiting = np.sum(self.conflict_groups_waiting > 0)
 
@@ -149,13 +152,15 @@ class PetriNet:
 
             for cgi in np.argwhere(self.conflict_groups_waiting == min_time).flatten():
                 for ti in np.where(self.conflict_group_data[cgi][0])[0]:
-                    t = self.transitions[ti]
+                    t: TransitionTimed = self.transitions[ti]
                     if t.is_waiting:
-                        t.fire()
-                        num_fired += 1
-                        if record_fired:
-                            self.fired.append(t)
-                        break
+                        if t.output_possible():
+                            t.fire_phase2()
+                            break
+                        else:
+                            msg = f'timed transition "{t.name}" was fired, but output not possible for phase 2'
+                            raise RuntimeError(msg)
+
                 self.conflict_groups_waiting[cgi] = 0
 
             np.subtract(self.conflict_groups_waiting, min_time, out=self.conflict_groups_waiting)
@@ -198,14 +203,16 @@ class PetriNet:
                 for cg_t in cg:
                     # ignore inhibitors!
                     t_in = set(arc.source for arc in t.inputs if isinstance(arc, Arc))
-                    t_out = set(
-                        arc.target for arc in t.outputs if isinstance(arc, Arc) and not arc.target_infinite_capacity)
+                    #t_out = set(
+                    #    arc.target for arc in t.outputs if isinstance(arc, Arc) and not arc.target_infinite_capacity)
                     cg_t_in = set(arc.source for arc in cg_t.inputs if isinstance(arc, Arc))
-                    cg_t_out = set(
-                        arc.target for arc in cg_t.outputs if isinstance(arc, Arc) and not arc.target_infinite_capacity)
+                    #cg_t_out = set(
+                    #    arc.target for arc in cg_t.outputs if isinstance(arc, Arc) and not arc.target_infinite_capacity)
+
+                    # [NOTE] outputs collision ignored
 
                     add_to_cg = add_to_cg or not t_in.isdisjoint(cg_t_in)
-                    add_to_cg = add_to_cg or not t_out.isdisjoint(cg_t_out)
+                    #add_to_cg = add_to_cg or not t_out.isdisjoint(cg_t_out)
                     if add_to_cg:
                         break
                 if add_to_cg:

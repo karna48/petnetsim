@@ -64,9 +64,12 @@ class Transition:
         self.in_arcs = []  # init in reset
         self.inhibitors = []  # init in reset
 
+    def output_possible(self):
+        return all(arc.target.can_add(arc.n_tokens) for arc in self.outputs)
+
     def enabled(self):
         return all(arc.source.can_remove(arc.n_tokens) for arc in self.in_arcs) \
-               and all(arc.target.can_add(arc.n_tokens) for arc in self.outputs) \
+               and self.output_possible() \
                and not any(inhibitor.source.can_remove(inhibitor.n_tokens) for inhibitor in self.inhibitors)
 
     def fire(self):
@@ -119,17 +122,20 @@ class TransitionTimed(Transition):
     def enabled(self):
         return super().enabled() and not self.is_waiting
 
+    def choose_time(self):
+        self.time = self.p_distribution_func(self.t_min, self.t_max)
+        return self.time
+
     def fire(self):
         for arc in self.in_arcs:
             arc.source.remove(arc.n_tokens)
         self.is_waiting = True
-        self.time = self.p_distribution_func(self.t_min, self.t_max)
+        self.fired_times += 1
 
     def fire_phase2(self):
         for arc in self.outputs:
             arc.target.add(arc.n_tokens)
         self.is_waiting = False
-        self.fired_times += 1
 
     def reset(self):
         super().reset()

@@ -28,12 +28,12 @@ def run():
 
     while not petri_net.ended and petri_net.step_num < max_steps:
         petri_net.step()
-        # print('--------------- step', petri_net.step_num, '   t:', petri_net.time)
-        # if len(petri_net.fired):
-        #     print(' fired: ', end='')
-        #     print(*(t.name for t in petri_net.fired), sep=', ')
+        print('--------------- step', petri_net.step_num, '   t:', petri_net.time)
+        if len(petri_net.fired):
+            print(' fired: ', end='')
+            print(*(t.name for t in petri_net.fired), sep=', ')
 
-        # petri_net.print_places()
+        petri_net.print_places()
 
         print(petri_net.step_num, petri_net.time, ', '.join(t.name for t in petri_net.fired), sep='\t')
 

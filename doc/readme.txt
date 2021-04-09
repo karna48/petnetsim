@@ -1,0 +1,1 @@
+popis_cz.{odt,pdf} are not current for the source!
