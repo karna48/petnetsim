@@ -41,7 +41,9 @@ class PetriNet:
                 v = default
             return v
 
-        arcs = [Arc(a[0], a[1], get_i(a, 2), context=context) if isinstance(a, (tuple, list)) else a for a in arcs]
+        arcs = [Arc(a[0], a[1], get_i(a, 2), get_i(a, 3, None), context=context)
+                if isinstance(a, (tuple, list)) else a
+                for a in arcs]
 
         for arc in arcs:
             if arc.name in self._names_lookup:
@@ -65,6 +67,19 @@ class PetriNet:
         self.time = 0.0
         # fired in last step
         self.fired = []
+
+    def clone(self, prefix: str, places, transitions, arcs, context=default_context()):
+        for p in self.places:
+            places.append(p.clone(prefix))
+        for t in self.transitions:
+            transitions.append(t.clone(prefix))
+        for a in self.arcs:
+            if isinstance(a, Arc):
+                arcs.append((prefix+a.source.name, prefix+a.target.name, a.n_tokens, prefix+a.name))
+            elif isinstance(a, Inhibitor):
+                arcs.append(Inhibitor(prefix+a.source.name, prefix+a.target.name, a.n_tokens, prefix+a.name))
+            else:
+                raise TypeError(f'cannot handle type: {type(a)}')
 
     @property
     def ended(self):
@@ -130,7 +145,7 @@ class PetriNet:
                                 t_fire_idx = timed_t_idx
                                 timed_t: TransitionTimed = self.transitions[timed_t_idx]
                                 self.conflict_groups_waiting[cgi] = timed_t.choose_time()
-                                print(' ', timed_t.name, 'wait =', self.conflict_groups_waiting[cgi])
+                                # print(' ', timed_t.name, 'wait =', self.conflict_groups_waiting[cgi])
 
                     if t_fire_idx is not None:
                         t = self.transitions[t_fire_idx]

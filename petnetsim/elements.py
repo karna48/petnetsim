@@ -1,5 +1,5 @@
 import random as _random
-from copy import deepcopy
+from copy import copy, deepcopy
 
 _default_context_init = {
     'counters': {'P': 1, 'T': 1, 'A': 1, 'I': 1}
@@ -25,7 +25,7 @@ def reset_default_context():
 class Place:
     INF_CAPACITY = 0
 
-    def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY, context=_default_context):
+    def __init__(self, name=None, init_tokens=0, capacity=INF_CAPACITY, context=default_context()):
         if name is None:
             self.name = 'P_'+str(context['counters']['P'])
             context['counters']['P'] += 1
@@ -50,9 +50,14 @@ class Place:
     def reset(self):
         self.tokens = self.init_tokens
 
+    def clone(self, prefix):
+        p = copy(self)
+        p.name = prefix+p.name
+        return p
+
 
 class Transition:
-    def __init__(self, name, context=_default_context):
+    def __init__(self, name, context=default_context()):
         if name is None:
             self.name = 'T_'+str(context['counters']['T'])
             context['counters']['T'] += 1
@@ -92,11 +97,17 @@ class Transition:
     def reset(self):
         self.fired_times = 0
 
+    def clone(self, prefix):
+        return Transition(prefix+self.name)
+
 
 class TransitionPriority(Transition):
-    def __init__(self, name, priority, context=_default_context):
+    def __init__(self, name, priority, context=default_context()):
         super().__init__(name, context)
         self.priority = priority
+
+    def clone(self, prefix):
+        return TransitionPriority(prefix+self.name, self.priority)
 
 
 def constant_distribution(t_min, t_max):
@@ -110,7 +121,7 @@ def uniform_distribution(t_min, t_max):
 class TransitionTimed(Transition):
     T_EPSILON = 1e6
 
-    def __init__(self, name, t_min, t_max=1, p_distribution_func=constant_distribution, context=_default_context):
+    def __init__(self, name, t_min, t_max=1, p_distribution_func=constant_distribution, context=default_context()):
         super().__init__(name, context)
         self.remaining = 0
         self.t_min = t_min
@@ -141,16 +152,22 @@ class TransitionTimed(Transition):
         super().reset()
         self.is_waiting = False
 
+    def clone(self, prefix):
+        return TransitionTimed(prefix+self.name, self.t_min, self.t_max, self.p_distribution_func)
+
 
 class TransitionStochastic(Transition):
     # NOTE: stochastic is almost normal transition
-    def __init__(self, name, probability, context=_default_context):
+    def __init__(self, name, probability, context=default_context()):
         super().__init__(name, context)
         self.probability = probability
 
+    def clone(self, prefix):
+        return TransitionStochastic(prefix+self.name, self.probability)
+
 
 class Arc:
-    def __init__(self, source, target, n_tokens=1, name=None, context=_default_context):
+    def __init__(self, source, target, n_tokens=1, name=None, context=default_context()):
         if name is None:
             self.name = 'Arc_'+str(context['counters']['A'])
             context['counters']['A'] += 1
@@ -186,7 +203,7 @@ class Arc:
 
 
 class Inhibitor:
-    def __init__(self, source, target, n_tokens=1, name=None, context=_default_context):
+    def __init__(self, source, target, n_tokens=1, name=None, context=default_context()):
         if name is None:
             self.name = 'Inhibitor_'+str(context['counters']['I'])
             context['counters']['I'] += 1
