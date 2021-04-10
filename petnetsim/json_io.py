@@ -1,8 +1,9 @@
-import json
 import io
+import json
 from itertools import starmap, chain
+from typing import List, Union
+
 from .elements import *
-from typing import List, Dict, Union
 
 
 def load(file, context=default_context(), opts=None):
@@ -54,6 +55,8 @@ def load(file, context=default_context(), opts=None):
                     dist_func = dfuncs[0]
                 else:
                     raise RuntimeError('error in opts dist_functions for function: '+dfn)
+            else:
+                raise RuntimeError('unknown distribution: '+dist)
             transition = TransitionTimed(name, t_min, t_max, dist_func, context=context)
             obj_lookup[name_idx] = transition
             return transition

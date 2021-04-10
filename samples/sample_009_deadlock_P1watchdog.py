@@ -2,10 +2,10 @@
 
 # TODO timed transitions not working correctly with normal transitions
 
-from itertools import count, combinations
-from petnetsim import *
-import numpy as np
 import itertools
+
+from petnetsim import *
+
 
 def run():
 

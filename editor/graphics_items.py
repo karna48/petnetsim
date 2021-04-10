@@ -1,11 +1,13 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from math import sin, cos, pi
+from typing import Union, Any
+
+import numpy as np
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 from petnetsim.elements import Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic, Arc, \
     Inhibitor
-from typing import Union, List, Any
-from math import sin, cos, atan2, pi
-import numpy as np
 from .mode import Mode
 
 

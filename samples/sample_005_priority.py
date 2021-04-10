@@ -1,8 +1,6 @@
 # doc/drawing/sample_005_priority.svg
 
-from itertools import count, combinations
 from petnetsim import *
-import numpy as np
 
 
 def run():

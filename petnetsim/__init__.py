@@ -1,9 +1,14 @@
-import itertools
 from enum import IntEnum
 import numpy as np
-from operator import attrgetter
 from .elements import *
 import sys
+import sys
+from enum import IntEnum
+
+import numpy as np
+
+from .elements import *
+
 
 # from .xml_loader import load_xml
 

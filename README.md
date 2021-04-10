@@ -8,7 +8,7 @@ Petri Network simulator
 * direct simulation API
 * JSON file format
 * editor
-* animated simulation in editor (good for student demonstation)
+* animated simulation in the editor (good for demonstration and teaching)
 
 # Known bugs
 * simulation: timed and untimed transitions do not work well together

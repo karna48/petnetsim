@@ -11,13 +11,13 @@ class SimulationController:
         self.editor = editor
         self.petrinet = PetriNet((), (), ())  # empty net, will be replaced
         self.step_animation_duration = 0
-        self.t1 = time()  # begining of current step
+        self.t1 = time()  # beginning of current step
         self.auto_run_next_step = False
         self.step_fired_arcs = []
 
         self.animate_timer = QTimer()
         self.animate_timer.timeout.connect(self.animate)
-        self.animate_waiting = True  # timer is running, but no animation and stepping shoud be done now
+        self.animate_waiting = True  # timer is running, but no animation and stepping should be done now
 
     def init_petrinet(self):
         self.petrinet = self.editor.verified_petrinet(inform_success=False, include_item_lookups=True)

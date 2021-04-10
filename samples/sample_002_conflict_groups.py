@@ -1,9 +1,6 @@
 # doc/drawing/sample_002_conflict_groups.svg
 
-from itertools import count, combinations
 from petnetsim import *
-from random import choice
-import numpy as np
 
 def run():
     petri_net = PetriNet([Place('A', init_tokens=10),

@@ -1,16 +1,17 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from collections import defaultdict
+from itertools import chain
+from typing import Union, List
+
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 import petnetsim.json_io as json_io
 from petnetsim import PetriNet
 from petnetsim.elements import Place, Transition, \
     TransitionPriority, TransitionTimed, TransitionStochastic, \
-    Arc, Inhibitor
-from typing import Union, List, Dict
-from itertools import chain
-from collections import defaultdict
+    Arc
 from .graphics_items import PlaceItem, TransitionItem, ArcItem, Port
-import enum
 from .mode import Mode
 
 PlaceTransitionUnion = Union[Place, Transition, TransitionPriority, TransitionTimed, TransitionStochastic]

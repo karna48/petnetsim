@@ -1,7 +1,6 @@
 
 # doc/drawing/sample_001_basic.svg
 
-from itertools import count, combinations
 from petnetsim import *
 
 

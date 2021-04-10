@@ -1,9 +1,9 @@
 # doc/drawing/sample_008_deadlock_priority.svg
 
-from itertools import count, combinations
-from petnetsim import *
-import numpy as np
 import itertools
+
+from petnetsim import *
+
 
 def run():
 
