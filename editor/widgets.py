@@ -5,7 +5,7 @@ from typing import Union
 from .graphics_items import PlaceItem, TransitionItem, ArcItem
 from petnetsim.elements import \
     Place, Transition, TransitionStochastic, \
-    TransitionPriority, TransitionTimed, Arc, \
+    TransitionPriority, TransitionTimed, Arc, Inhibitor, \
     constant_distribution, uniform_distribution
 
 from collections import namedtuple, OrderedDict
@@ -84,7 +84,7 @@ class ItemProperties(QStackedWidget):
             self.is_filling_forms = True
             self.arc_name_lineEdit.setText(item.arc.name)
             self.arc_n_tokens_spinBox.setValue(item.arc.n_tokens)
-            self.arc_inhibitor_checkBox.setChecked(type(item.arc) != Arc)
+            self.arc_inhibitor_checkBox.setChecked(not isinstance(item.arc, Arc))
             self.is_filling_forms = False
 
     def place_name_changed(self, name):
@@ -162,4 +162,31 @@ class ItemProperties(QStackedWidget):
 
     def arc_inhibitor_toggled(self, toggled: bool):
         if not self.is_filling_forms:
-            print('TODO: arc/inhibitor switch')
+            editor = self.main_window.editor
+            if isinstance(editor.selected, ArcItem):
+                if toggled:
+                    if isinstance(editor.selected.arc, Arc):
+                        try:
+                            new_arc = editor.selected.arc.to_inhibitor()
+                        except TypeError as e:
+                            QMessageBox.warning(self.main_window, 'Warning', 'cannot change to inhibitor: '+str(e))
+                            self.is_filling_forms = True
+                            self.arc_inhibitor_checkBox.setChecked(False)
+                            self.is_filling_forms = False
+                            return
+                    else:
+                        QMessageBox.critical(self.main_window, 'Error',
+                                             f'arc should be instance of Arc, it is: {type(editor.selected.arc)}')
+                        return
+                else:
+                    if isinstance(editor.selected.arc, Inhibitor):
+                        new_arc = editor.selected.arc.to_arc()
+                    else:
+                        QMessageBox.critical(self.main_window, 'Error',
+                                             f'arc should be instance of Inhibitor, it is: {type(editor.selected.arc)}')
+                        return
+
+                editor.selected.set_arc_or_inhibitor(new_arc)
+            else:
+                QMessageBox.critical(self.main_window, 'Error', 'arc_inhibitor_toggled but no ArcItem selected')
+

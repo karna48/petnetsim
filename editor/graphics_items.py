@@ -229,21 +229,8 @@ class ArcItem(QGraphicsItemGroup):
         self.source = source
         self.target = target
 
-        arrow_path = QPainterPath()
-
-        arrow_path.addPolygon(
-            QPolygonF(
-                (QPointF(0, 0),
-                 QPointF(-8, -3),
-                 QPointF(-8, +3),
-                 QPointF(0, 0)
-                 )
-            )
-        )
 
         self.line = QGraphicsLineItem()
-        self.end_shape = QGraphicsPathItem(arrow_path)
-        self.end_shape.setBrush(QColor('black'))
         self.n_tokens_text = QGraphicsSimpleTextItem('n_tokens')
         self.fired_marker = QGraphicsEllipseItem(ArcItem.FiredMarkerRect)
         self.fired_marker.setBrush(ArcItem.FiredMarkerBrush)
@@ -252,11 +239,11 @@ class ArcItem(QGraphicsItemGroup):
 
         self.is_selected = False
 
+        self.end_shape = None
         self.set_arc_or_inhibitor(arc)
         self.update_texts()
 
         self.addToGroup(self.line)
-        self.addToGroup(self.end_shape)
         self.addToGroup(self.n_tokens_text)
         self.addToGroup(self.fired_marker)
 
@@ -268,10 +255,30 @@ class ArcItem(QGraphicsItemGroup):
 
     def set_arc_or_inhibitor(self, arc: Union[Arc, Inhibitor]):
         self.arc = arc
-        # if type(arc) == Arc:
-        #     self.end_shape.setText(ArcItem.ARC_END)
-        # else:
-        #     self.end_shape.setText(ArcItem.INHIBITOR_END)
+        if self.end_shape is not None:
+            self.removeFromGroup(self.end_shape)
+
+        if isinstance(arc, Arc):
+            arrow_path = QPainterPath()
+            arrow_path.addPolygon(
+                QPolygonF(
+                    (QPointF(0, 0),
+                     QPointF(-8, -3),
+                     QPointF(-8, +3),
+                     QPointF(0, 0)
+                     )
+                )
+            )
+            self.end_shape = QGraphicsPathItem(arrow_path)
+            self.end_shape.setBrush(QColor('black'))
+        else:
+            r = 7
+            self.end_shape = QGraphicsEllipseItem(-r, -r, 2*r, 2*r)
+            self.end_shape.setBrush(QColor('white'))
+            self.end_shape.setPen(QColor('black'))
+
+        self.addToGroup(self.end_shape)
+        self.update_ports()
 
     def update_ports(self, p2: QPointF = None):
         p1 = self.source.scenePos()

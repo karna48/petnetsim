@@ -180,6 +180,9 @@ class Arc:
         if not (isinstance(self.source, str) or isinstance(self.target, str)):
             self.connect(None)
 
+    def to_inhibitor(self, context=default_context()):
+        return Inhibitor(self.source, self.target, self.n_tokens, self.name, context)
+
     def connect(self, names_lookup):
         if isinstance(self.source, str):
             self.source = names_lookup[self.source]
@@ -216,6 +219,9 @@ class Inhibitor:
         if not (isinstance(self.source, str) or isinstance(self.target, str)):
             self.connect(None)
 
+    def to_arc(self, context=default_context()):
+        return Arc(self.source, self.target, self.n_tokens, self.name, context)
+
     def connect(self, names_lookup):
         if isinstance(self.source, str):
             self.source = names_lookup[self.source]
@@ -223,7 +229,7 @@ class Inhibitor:
             self.target = names_lookup[self.target]
 
         if not isinstance(self.source, Place):
-            raise RuntimeError('inhibitor source must be a Place')
+            raise TypeError('inhibitor source must be a Place')
 
         if isinstance(self.target, Transition):
             self.target.inputs.add(self)
