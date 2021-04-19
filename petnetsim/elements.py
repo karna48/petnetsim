@@ -154,9 +154,9 @@ class TransitionTimed(Transition):
 
     def dist_time_str(self):
         if self.p_distribution_func is constant_distribution:
-            return f"{self.t_min:.3}s"
+            return f"{self.t_min:.3f}s"
         elif self.p_distribution_func is uniform_distribution:
-            return f"U({self.t_min:.3}~{self.t_max:.3})s"
+            return f"U({self.t_min:.3f}~{self.t_max:.3f})s"
         return f"(CustomPDist)"
 
     def clone(self, prefix):

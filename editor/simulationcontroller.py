@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QTimer
 from . import Editor
 from petnetsim import PetriNet
+from petnetsim.elements import TransitionTimed
 from time import time
 from itertools import chain
 
@@ -66,7 +67,11 @@ class SimulationController:
                 self.petrinet.arc_item_lookup[arc].fired_marker_set_visibility(False)
 
             self.step_fired_arcs.clear()
-            self.step_fired_arcs.extend(chain.from_iterable(chain(t.in_arcs, t.outputs) for t in self.petrinet.fired))
+            self.step_fired_arcs.extend(
+                chain.from_iterable(t.in_arcs if isinstance(t, TransitionTimed) else chain(t.in_arcs, t.outputs)
+                                    for t in self.petrinet.fired)
+            )
+            self.step_fired_arcs.extend(chain.from_iterable(t.outputs for t in self.petrinet.fired_phase2))
             for arc in self.step_fired_arcs:
                 self.petrinet.arc_item_lookup[arc].fired_marker_set_visibility(True)
 

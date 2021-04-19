@@ -72,6 +72,7 @@ class PetriNet:
         self.time = 0.0
         # fired in last step
         self.fired = []
+        self.fired_phase2 = []
 
     def clone(self, prefix: str, places, transitions, arcs, context=default_context()):
         for p in self.places:
@@ -104,6 +105,7 @@ class PetriNet:
     def step(self, record_fired=True):
         if record_fired:
             self.fired.clear()
+            self.fired_phase2.clear()
         # enabled transitions
         for ti, t in enumerate(self.transitions):
             self.enabled[ti] = t.enabled()
@@ -176,6 +178,7 @@ class PetriNet:
                     if t.is_waiting:
                         if t.output_possible():
                             t.fire_phase2()
+                            self.fired_phase2.append(t)
                             break
                         else:
                             msg = f'timed transition "{t.name}" was fired, but output not possible for phase 2'
