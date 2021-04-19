@@ -176,7 +176,16 @@ class TransitionItem(QGraphicsItemGroup):
         self.name_text.setText(self.transition.name)
         self.name_text.setPos(-6 * len(self.transition.name) / 2, -h / 2 - 30)
         # TODO: different types
-        s = ''
+
+        if isinstance(self.transition, TransitionPriority):
+            s = f'p={self.transition.priority}'
+        elif isinstance(self.transition, TransitionStochastic):
+            s = f'{self.transition.probability*100}%'
+        elif isinstance(self.transition, TransitionTimed):
+            s = self.transition.dist_time_str()
+        else:
+            s = ''
+
         self.attribute_text.setText(s)
         self.attribute_text.setPos(-6 * len(s) / 2, h / 2 + 5)
 
@@ -230,7 +239,7 @@ class ArcItem(QGraphicsItemGroup):
         self.target = target
 
 
-        self.line = QGraphicsLineItem()
+        self.line_item = QGraphicsLineItem()
         self.n_tokens_text = QGraphicsSimpleTextItem('n_tokens')
         self.fired_marker = QGraphicsEllipseItem(ArcItem.FiredMarkerRect)
         self.fired_marker.setBrush(ArcItem.FiredMarkerBrush)
@@ -243,7 +252,7 @@ class ArcItem(QGraphicsItemGroup):
         self.set_arc_or_inhibitor(arc)
         self.update_texts()
 
-        self.addToGroup(self.line)
+        self.addToGroup(self.line_item)
         self.addToGroup(self.n_tokens_text)
         self.addToGroup(self.fired_marker)
 
@@ -284,7 +293,7 @@ class ArcItem(QGraphicsItemGroup):
         p1 = self.source.scenePos()
         p2 = p2 if p2 is not None else self.target.scenePos()
         line = QLineF(p1, p2)
-        self.line.setLine(line)
+        self.line_item.setLine(line)
         center: QPointF = line.center()
         s = str(self.arc.n_tokens)
         self.n_tokens_text.setPos(center.x() - 6 * len(s) / 2, center.y() - 20)
@@ -294,10 +303,10 @@ class ArcItem(QGraphicsItemGroup):
 
     def set_selected(self, b):
         self.is_selected = b
-        self.line.setPen(ArcItem.SelectedPen if self.is_selected else ArcItem.NormalPen)
+        self.line_item.setPen(ArcItem.SelectedPen if self.is_selected else ArcItem.NormalPen)
 
     def update_texts(self):
-        center: QPointF = self.line.line().center()
+        center: QPointF = self.line_item.line().center()
         s = str(self.arc.n_tokens)
         self.n_tokens_text.setText(s)
         self.n_tokens_text.setPos(center.x() - 6 * len(s) / 2, center.y() - 20)
@@ -307,22 +316,28 @@ class ArcItem(QGraphicsItemGroup):
         self.fired_marker.setVisible(is_visible)
 
     def fired_marker_interpolate_position(self, t):
-        line: QLineF = self.line.line()
+        line: QLineF = self.line_item.line()
         self.fired_marker.setPos(line.pointAt(t))
 
     def shape(self) -> QPainterPath:
-        # TODO not the bounding box, please!
+        bounding_width_half = 5
         pp = QPainterPath()
-        rect = self.line.boundingRect()
-        if rect.width() < 5:
-            rem = 5 - rect.width()
-            rect.setX(rect.x() + rem / 2)
-            rect.setWidth(rect.width() + rem)
-        if rect.height() < 5:
-            rem = 5 - rect.height()
-            rect.setY(rect.y() + rem / 2)
-            rect.setHeight(rect.height() + rem)
-        pp.addRect(rect)
+
+        l = self.line_item.line()  # copy of line
+        p1 = l.p1()
+        p2 = l.p2()
+        normal_half = l.normalVector().unitVector()
+        normal_half.setLength(bounding_width_half)
+        nh_vec = normal_half.p2() - normal_half.p1()
+
+        A = p1 + nh_vec
+        B = p2 + nh_vec
+        C = p2 - nh_vec
+        D = p1 - nh_vec
+
+        pp.addPolygon(QPolygonF([A, B, C, D]))
+        pp.closeSubpath()
+
         return pp
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):

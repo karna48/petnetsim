@@ -1,15 +1,20 @@
 from PyQt5 import uic
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 import sys
 import editor
 from editor.mode import ModeSwitch, Mode
 from editor.simulationcontroller import SimulationController
+from pathlib import Path
+
+root_path = Path(__file__).parent
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('editor/petnetsim.ui', self)
+        uic.loadUi(str((root_path / 'editor' / 'petnetsim.ui').resolve()), self)
+        self.setWindowIcon(QIcon(str((root_path / 'editor' / 'pns_icon.svg').resolve())))
 
         self.item_properties.after_init()
         self.item_properties.item_selected(None)
