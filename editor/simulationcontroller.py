@@ -75,10 +75,11 @@ class SimulationController:
             for arc in self.step_fired_arcs:
                 self.petrinet.arc_item_lookup[arc].fired_marker_set_visibility(True)
 
-            for t in self.petrinet.fired:
+            for t in chain(self.petrinet.fired, self.petrinet.fired_phase2):
                 for place in chain((pt_arc.source for pt_arc in t.in_arcs), (tp_arc.target for tp_arc in t.outputs)):
                     self.petrinet.place_item_lookup[place].update_tokens_text_simulation()
 
+            for t in self.petrinet.fired:
                 self.petrinet.transition_item_lookup[t].set_brush(True)
 
     @property
