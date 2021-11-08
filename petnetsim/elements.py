@@ -1,5 +1,6 @@
 import random as _random
 from copy import copy, deepcopy
+import re
 
 _default_context_init = {
     'counters': {'P': 1, 'T': 1, 'A': 1, 'I': 1}
@@ -30,6 +31,10 @@ class Place:
             self.name = 'P_'+str(context['counters']['P'])
             context['counters']['P'] += 1
         else:
+            match = re.fullmatch(r'P_(\d+)', name)
+            if match is not None:
+                context['counters']['P'] = int(match.group(1)) + 1
+
             self.name = name
         self.capacity = capacity
         self.init_tokens = init_tokens
@@ -62,6 +67,9 @@ class Transition:
             self.name = 'T_'+str(context['counters']['T'])
             context['counters']['T'] += 1
         else:
+            match = re.fullmatch(r'T_(\d+)', name)
+            if match is not None:
+                context['counters']['T'] = int(match.group(1)) + 1
             self.name = name
         self.inputs = set()   # Arc, Inhibitor
         self.outputs = set()  # Arc, Inhibitor
@@ -179,6 +187,9 @@ class Arc:
             self.name = 'Arc_'+str(context['counters']['A'])
             context['counters']['A'] += 1
         else:
+            match = re.fullmatch(r'Arc_(\d+)', name)
+            if match is not None:
+                context['counters']['A'] = int(match.group(1)) + 1
             self.name = name
         self.source = source
         self.target = target
@@ -218,6 +229,9 @@ class Inhibitor:
             self.name = 'Inhibitor_'+str(context['counters']['I'])
             context['counters']['I'] += 1
         else:
+            match = re.fullmatch(r'Inhibitor_(\d+)', name)
+            if match is not None:
+                context['counters']['I'] = int(match.group(1)) + 1
             self.name = name
         self.source = source
         self.target = target
