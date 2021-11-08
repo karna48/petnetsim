@@ -187,8 +187,7 @@ class Editor(QGraphicsView):
             self.select(None)
             if self.mode in (Mode.ArcSource, Mode.ArcTarget):
                 self.mode = Mode.Normal
-
-        if key_event.key() == Qt.Key_Delete:
+        elif key_event.key() == Qt.Key_Delete:
             if self.mode == Mode.Normal:
                 if isinstance(self.selected, PlaceItem):
                     self.delete_place_item(self.selected)
@@ -196,24 +195,27 @@ class Editor(QGraphicsView):
                     self.delete_transition_item(self.selected)
                 elif isinstance(self.selected, ArcItem):
                     self.delete_arc_item(self.selected)
-
-        if key_event.key() == Qt.Key_P:
+        elif key_event.key() == Qt.Key_P:
             if self.mode == Mode.Normal:
                 place_item = self.add_place()
                 self.select(place_item)
-
-        if key_event.key() == Qt.Key_T:
+        elif key_event.key() == Qt.Key_T:
             if self.mode == Mode.Normal:
                 transition_item = self.add_transition()
                 self.select(transition_item)
-
-        if key_event.key() == Qt.Key_A:
+        elif key_event.key() == Qt.Key_A:
             if self.mode == Mode.Normal:
                 for item in chain(self.place_items, self.transition_items):
                     item.show_ports()
                 self.mode = Mode.ArcSource
             elif self.mode in (Mode.ArcSource, Mode.ArcTarget):
                 self.mode = Mode.Normal
+        elif key_event.key() == Qt.Key_Plus:
+            self.scale(1.15, 1.15)
+        elif key_event.key() == Qt.Key_Minus:
+            self.scale(0.869565217, 0.869565217)
+        elif key_event.key() == Qt.Key_0:
+            self.resetTransform()
 
     def keyReleaseEvent(self, key_event: QKeyEvent):
         if key_event.isAutoRepeat():
