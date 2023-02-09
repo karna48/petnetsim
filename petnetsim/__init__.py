@@ -65,8 +65,8 @@ class PetriNet:
 
         self._make_conflict_groups()
 
-        self.enabled = np.zeros(len(transitions), dtype=np.bool)
-        self.enabled_tmp = np.zeros(len(transitions), dtype=np.bool)
+        self.enabled = np.zeros(len(transitions), dtype=np.bool_)
+        self.enabled_tmp = np.zeros(len(transitions), dtype=np.bool_)
         self._ended = False
         self.step_num = 0
         self.time = 0.0
@@ -271,7 +271,7 @@ class PetriNet:
             elif all(tt == CGT.Normal or tt == CGT.Timed for tt in t_types):
                 # Timed can be mixed with Normal
                 cg_type = CGT.Timed
-                conflict_group_data[cg_i] = np.zeros((2, len(self.transitions)), dtype=np.bool)
+                conflict_group_data[cg_i] = np.zeros((2, len(self.transitions)), dtype=np.bool_)
             elif all(tt == CGT.Stochastic for tt in t_types):
                 group_members_names = ', '.join([t.name for t in cg])
                 # stochastic are on their own
@@ -296,8 +296,8 @@ class PetriNet:
         self.conflict_groups_waiting = np.zeros(len(conflict_groups_sets))
         self.conflict_groups_sets = tuple(tuple(cg) for cg in conflict_groups_sets)
         self.conflict_groups_types = tuple(conflict_groups_types)
-        self.conflict_groups_mask = np.zeros((len(conflict_groups_sets), len(self.transitions)), dtype=np.bool)
-        self.enabled_conflict_groups = np.zeros((len(conflict_groups_sets), len(self.transitions)), dtype=np.bool)
+        self.conflict_groups_mask = np.zeros((len(conflict_groups_sets), len(self.transitions)), dtype=np.bool_)
+        self.enabled_conflict_groups = np.zeros((len(conflict_groups_sets), len(self.transitions)), dtype=np.bool_)
         for cgi, (cg, cgt) in enumerate(zip(conflict_groups_sets, conflict_groups_types)):
             for ti, t in enumerate(self.transitions):
                 t_in_cg = t in cg
