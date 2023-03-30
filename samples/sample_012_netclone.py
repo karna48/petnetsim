@@ -15,7 +15,7 @@ def run():
     for client_i in range(1, 11):
         prefix = f'Client_{client_i}_'
         subnet.clone(prefix, places, transitions, arcs)
-        arcs.append(('Waves', prefix + 'Input'))
+        arcs.append(('make_wave', prefix + 'Input'))
 
     petri_net = PetriNet(places, transitions, arcs)
     print('conflict groups:', petri_net.conflict_groups_str)
