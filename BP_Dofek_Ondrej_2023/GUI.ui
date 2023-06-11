@@ -1,0 +1,1998 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1184</width>
+    <height>852</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="font">
+   <font>
+    <family>Palatino Linotype</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background color:rgb(0, 0, 0)
+color: rgb(255, 255, 255);</string>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="inputMethodHints">
+    <set>Qt::ImhNone</set>
+   </property>
+   <widget class="QComboBox" name="kriz1_combo">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>30</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="kriz1_label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>50</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>7</number>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz2_label">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>50</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="start_button">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>650</y>
+      <width>191</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>START</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz3_label">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>50</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz4_label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>300</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="steps_spin">
+    <property name="geometry">
+     <rect>
+      <x>1030</x>
+      <y>520</y>
+      <width>131</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="wrapping">
+     <bool>false</bool>
+    </property>
+    <property name="maximum">
+     <number>9999999</number>
+    </property>
+    <property name="singleStep">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>1000</number>
+    </property>
+    <property name="displayIntegerBase">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz7_label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>560</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz8_label">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>560</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz9_label">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>560</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz6_label">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>300</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="kriz5_label">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>300</y>
+      <width>180</width>
+      <height>180</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>krizovatky/ikony/silnice.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="kriz3_combo">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>30</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz4_combo">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>280</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz5_combo">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>280</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz6_combo">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>280</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz7_combo">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>540</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz8_combo">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>550</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz9_combo">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>540</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="kriz2_combo">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>30</y>
+      <width>179</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::NoInsert</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>silnice</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_prednost_zprava</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_ZV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_JV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SV</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_hlavni_SZ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_SJ</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>X_semafor_2proud_ZV</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QSpinBox" name="min_spin">
+    <property name="geometry">
+     <rect>
+      <x>1010</x>
+      <y>120</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>5</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="max_spin">
+    <property name="geometry">
+     <rect>
+      <x>1100</x>
+      <y>120</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="singleStep">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>7</number>
+    </property>
+    <property name="displayIntegerBase">
+     <number>9</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c12_spin">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>60</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="singleStep">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c23_spin">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>60</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c45_spin">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>310</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c56_spin">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>310</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c78_spin">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>560</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c89_spin">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>570</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c14_spin">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>240</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c25_spin">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>240</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c36_spin">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>240</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c47_spin">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>500</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c58_spin">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>510</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="c69_spin">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>500</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label12">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>140</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label21">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>120</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label32">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>120</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label23">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>140</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label54">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>370</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label45">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>390</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label65">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>370</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label56">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>390</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label98">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>630</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label89">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>650</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label87">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>630</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label78">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>650</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label41">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>230</y>
+      <width>20</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label14">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>230</y>
+      <width>20</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label25">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>230</y>
+      <width>20</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label52">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>230</y>
+      <width>20</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label36">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>230</y>
+      <width>20</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label63">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>230</y>
+      <width>20</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label47">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>480</y>
+      <width>20</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label74">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>480</y>
+      <width>20</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label58">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>480</y>
+      <width>20</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label85">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>480</y>
+      <width>20</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label69">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>480</y>
+      <width>20</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label96">
+    <property name="geometry">
+     <rect>
+      <x>849</x>
+      <y>480</y>
+      <width>21</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta12">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>170</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta21">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>90</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta32">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>90</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta23">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>160</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta63">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>240</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta36">
+    <property name="geometry">
+     <rect>
+      <x>805</x>
+      <y>240</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta65">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>340</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta56">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>410</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta45">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>410</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta54">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>340</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta74">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>500</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta47">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>500</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta78">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>670</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta87">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>610</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta89">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>670</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta98">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>600</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta85">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>510</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta58">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>510</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta69">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>500</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta96">
+    <property name="geometry">
+     <rect>
+      <x>880</x>
+      <y>500</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta41">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>240</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta14">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>240</y>
+      <width>20</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta25">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>250</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="auta52">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>250</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>1030</x>
+      <y>570</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Počet kroků</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>1010</x>
+      <y>70</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Generování tokenů</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>1100</x>
+      <y>150</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>t_max</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>1010</x>
+      <y>150</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>t_min</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>90</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>auto/s</string>
+    </property>
+   </widget>
+   <zorder>kriz1_label</zorder>
+   <zorder>kriz2_label</zorder>
+   <zorder>start_button</zorder>
+   <zorder>kriz1_combo</zorder>
+   <zorder>kriz3_label</zorder>
+   <zorder>kriz4_label</zorder>
+   <zorder>steps_spin</zorder>
+   <zorder>kriz7_label</zorder>
+   <zorder>kriz8_label</zorder>
+   <zorder>kriz9_label</zorder>
+   <zorder>kriz6_label</zorder>
+   <zorder>kriz5_label</zorder>
+   <zorder>kriz3_combo</zorder>
+   <zorder>kriz4_combo</zorder>
+   <zorder>kriz5_combo</zorder>
+   <zorder>kriz6_combo</zorder>
+   <zorder>kriz7_combo</zorder>
+   <zorder>kriz8_combo</zorder>
+   <zorder>kriz9_combo</zorder>
+   <zorder>kriz2_combo</zorder>
+   <zorder>min_spin</zorder>
+   <zorder>max_spin</zorder>
+   <zorder>c12_spin</zorder>
+   <zorder>c23_spin</zorder>
+   <zorder>c45_spin</zorder>
+   <zorder>c56_spin</zorder>
+   <zorder>c78_spin</zorder>
+   <zorder>c89_spin</zorder>
+   <zorder>c14_spin</zorder>
+   <zorder>c25_spin</zorder>
+   <zorder>c36_spin</zorder>
+   <zorder>c47_spin</zorder>
+   <zorder>c58_spin</zorder>
+   <zorder>c69_spin</zorder>
+   <zorder>label12</zorder>
+   <zorder>label21</zorder>
+   <zorder>label32</zorder>
+   <zorder>label23</zorder>
+   <zorder>label54</zorder>
+   <zorder>label45</zorder>
+   <zorder>label65</zorder>
+   <zorder>label56</zorder>
+   <zorder>label98</zorder>
+   <zorder>label89</zorder>
+   <zorder>label87</zorder>
+   <zorder>label78</zorder>
+   <zorder>label41</zorder>
+   <zorder>label14</zorder>
+   <zorder>label25</zorder>
+   <zorder>label52</zorder>
+   <zorder>label36</zorder>
+   <zorder>label63</zorder>
+   <zorder>label47</zorder>
+   <zorder>label74</zorder>
+   <zorder>label58</zorder>
+   <zorder>label85</zorder>
+   <zorder>label69</zorder>
+   <zorder>label96</zorder>
+   <zorder>auta12</zorder>
+   <zorder>auta21</zorder>
+   <zorder>auta32</zorder>
+   <zorder>auta23</zorder>
+   <zorder>auta63</zorder>
+   <zorder>auta36</zorder>
+   <zorder>auta65</zorder>
+   <zorder>auta56</zorder>
+   <zorder>auta45</zorder>
+   <zorder>auta54</zorder>
+   <zorder>auta74</zorder>
+   <zorder>auta47</zorder>
+   <zorder>auta78</zorder>
+   <zorder>auta87</zorder>
+   <zorder>auta89</zorder>
+   <zorder>auta98</zorder>
+   <zorder>auta85</zorder>
+   <zorder>auta58</zorder>
+   <zorder>auta69</zorder>
+   <zorder>auta96</zorder>
+   <zorder>auta41</zorder>
+   <zorder>auta14</zorder>
+   <zorder>auta25</zorder>
+   <zorder>auta52</zorder>
+   <zorder>label</zorder>
+   <zorder>label_2</zorder>
+   <zorder>label_3</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1184</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
